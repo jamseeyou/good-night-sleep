@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>今晚怎么睡？🌙</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="video-background">
+    <video autoplay muted loop playsinline id="bg-video">
+      <source src="home.mp4" type="video/mp4">
+    </video>
+    <div class="overlay"></div>
+  </div>
+
+  <main class="app-container">
+    <header class="header">
+      <div class="moon-icon">🌙</div>
+      <h1>Good Night</h1>
+      <p class="welcome">Welcome back,</p>
+      <h2>今晚你需要哪类睡眠？</h2>
+    </header>
+
+    <section class="mood-section">
+      <h3 class="section-title">选择今晚的情绪</h3>
+      <div class="grid-container">
+        
+        <div class="card" onclick="toggleAudio()">
+          <span class="icon">🌧</span>
+          <h4>放松</h4>
+          <p>缓解压力</p>
+        </div>
+
+        <div class="card">
+          <span class="icon">🌌</span>
+          <h4>深度睡眠</h4>
+          <p>更快入睡</p>
+        </div>
+
+        <div class="card">
+          <span class="icon">🌲</span>
+          <h4>恢复自身磁场</h4>
+          <p>自然白噪音修复</p>
+        </div>
+
+        <div class="card">
+          <span class="icon">☁️</span>
+          <h4>情景入睡</h4>
+          <p>选择沉浸式场景</p>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <nav class="bottom-nav">
+    <a href="#" class="nav-item active">
+      <span class="nav-icon">🌙</span>
+      <span>主页</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">🔍</span>
+      <span>搜索</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">＋</span>
+      <span>创作</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">♡</span>
+      <span>保存</span>
+    </a>
+    <a href="#" class="nav-item">
+      <span class="nav-icon">👤</span>
+      <span>我的</span>
+    </a>
+  </nav>
+
+  <script>
+    // 点击卡片控制雨声播放/暂停
+    function toggleAudio() {
+      const audio = document.getElementById('bg-audio');
+      if (audio.paused) {
+        audio.play();
+      } else {
+        audio.pause();
+      }
+    }
+  </script>
+</body>
+</html>
