@@ -31,30 +31,33 @@
       flex-direction: column;
       padding: 20px 16px 80px;
       overflow-y: auto;
-      gap: 16px;
+      gap: 14px;
+      position: relative;
     }
 
-    /* 1. 搜索框 */
+    /* 1. 搜索与链接粘贴框 */
     .search-bar {
       background: rgba(255, 255, 255, 0.1);
       backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 20px;
       padding: 10px 16px;
       display: flex;
       align-items: center;
-      justify-content: center;
       gap: 8px;
       font-size: 14px;
-      color: rgba(255, 255, 255, 0.8);
     }
     .search-bar input {
       background: transparent;
       border: none;
       outline: none;
       color: white;
-      width: 60%;
-      text-align: center;
+      width: 100%;
+      font-size: 13px;
+    }
+    .search-bar input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
     }
 
     /* 2. 类目可滑动板块 */
@@ -63,8 +66,8 @@
       gap: 10px;
       overflow-x: auto;
       white-space: nowrap;
-      scrollbar-width: none; /* 隐藏滚动条 */
-      padding-bottom: 4px;
+      scrollbar-width: none;
+      padding-bottom: 2px;
     }
     .category-scroll::-webkit-scrollbar { display: none; }
     
@@ -76,11 +79,14 @@
       font-size: 13px;
       color: rgba(255, 255, 255, 0.8);
       cursor: pointer;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
     }
     .chip.active {
       background: rgba(255, 255, 255, 0.3);
       border-color: #ffffff;
       font-weight: bold;
+      color: #ffffff;
     }
 
     /* 3. 可滑动视频列表 */
@@ -89,19 +95,35 @@
       gap: 12px;
       overflow-x: auto;
       scrollbar-width: none;
+      min-height: 75px;
     }
+    .video-list::-webkit-scrollbar { display: none; }
+
     .video-card {
-      min-width: 110px;
-      height: 80px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      min-width: 120px;
+      height: 75px;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       display: flex;
+      flex-direction: column;
       align-items: center;
       justify-content: center;
       font-size: 13px;
       cursor: pointer;
       flex-shrink: 0;
+      text-align: center;
+      padding: 6px;
+      transition: all 0.2s ease;
+    }
+    .video-card:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .video-card span {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 4px;
     }
 
     /* 4. 操作与定时栏 */
@@ -145,28 +167,26 @@
     }
     .video-display {
       flex: 1;
-      height: 200px;
-      background: rgba(0, 0, 0, 0.4);
+      height: 210px;
+      background: rgba(0, 0, 0, 0.6);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 16px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
       overflow: hidden;
+      position: relative;
     }
-    .video-display video {
+    .video-display iframe {
       width: 100%;
       height: 100%;
-      object-fit: cover;
+      border: none;
     }
     
-    /* 柱状图形音量条 (Vertical Slider) */
+    /* 柱状图形音量条 */
     .volume-container {
       display: flex;
       flex-direction: column;
       align-items: center;
       gap: 8px;
-      height: 200px;
+      height: 210px;
       justify-content: space-between;
     }
     .volume-label {
@@ -176,9 +196,9 @@
       letter-spacing: 2px;
     }
     .volume-slider {
-      -webkit-appearance: slider-vertical; /* 垂直滑动条 */
+      -webkit-appearance: slider-vertical;
       width: 12px;
-      height: 150px;
+      height: 160px;
       accent-color: #ffffff;
     }
 
@@ -186,7 +206,7 @@
     .action-bar {
       display: flex;
       justify-content: space-around;
-      margin-top: 8px;
+      margin-top: 4px;
     }
     .btn-action {
       background: rgba(255, 255, 255, 0.15);
@@ -207,12 +227,14 @@
       width: 100%;
       max-width: 430px;
       height: 65px;
-      background: rgba(15, 23, 42, 0.8);
+      background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.15);
       display: flex;
       justify-content: space-around;
       align-items: center;
+      z-index: 100;
     }
     .nav-item {
       display: flex;
@@ -227,6 +249,65 @@
       color: #ffffff;
       font-weight: bold;
     }
+
+    /* 8. 弹窗添加样式 (Modal) */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(8px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-box {
+      width: 85%;
+      max-width: 360px;
+      background: #1e293b;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-box h3 {
+      font-size: 16px;
+      text-align: center;
+      margin-bottom: 4px;
+    }
+    .modal-box input, .modal-box select {
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+    }
+    .modal-box select option {
+      background: #1e293b;
+      color: white;
+    }
+    .modal-btns {
+      display: flex;
+      gap: 10px;
+      margin-top: 8px;
+    }
+    .modal-btns button {
+      flex: 1;
+      padding: 10px;
+      border-radius: 10px;
+      border: none;
+      font-size: 13px;
+      cursor: pointer;
+    }
+    .btn-confirm { background: #3b82f6; color: white; }
+    .btn-cancel { background: rgba(255, 255, 255, 0.2); color: white; }
   </style>
 </head>
 <body>
@@ -234,49 +315,67 @@
   <div class="app-container">
     
     <div class="search-bar">
-      🔍 <input type="text" placeholder="去搜索，添加视频">
+      🔍 
+      <input 
+        type="text" 
+        id="youtube-url-input" 
+        placeholder="粘贴 YouTube 视频链接即可立即播放..." 
+        oninput="handleUrlPaste(this.value)"
+      >
     </div>
 
-    <div class="category-scroll">
-      <div class="chip active">人声&口腔音</div>
-      <div class="chip">白噪音</div>
-      <div class="chip">场景扮演</div>
-      <div class="chip">敲击音</div>
-      <div class="chip">自然雨声</div>
-    </div>
+    <div class="category-scroll" id="category-container"></div>
 
-    <div class="video-list">
-      <div class="video-card">视频 A</div>
-      <div class="video-card">视频 B</div>
-      <div class="video-card">视频 C</div>
-      <div class="video-card">视频 D</div>
-    </div>
+    <div class="video-list" id="video-list-container"></div>
 
     <div class="controls-top">
       <div class="btn-group-sm">
-        <button class="btn-circle" title="添加视频">+</button>
-        <button class="btn-circle" title="删除视频">-</button>
+        <button class="btn-circle" title="添加类目或视频" onclick="openAddModal()">+</button>
       </div>
       <button class="btn-glass" id="timer-btn" onclick="setTimer()">⏱ 定时: 关</button>
     </div>
 
     <div class="player-section">
       <div class="video-display">
-        <video id="main-video" autoplay loop muted playsinline src="rain_cozy_room.mp4"></video>
+        <iframe 
+          id="youtube-player" 
+          src="https://www.youtube.com/embed/a0tl9k3deV0?enablejsapi=1&autoplay=1&mute=1&loop=1&playlist=a0tl9k3deV0" 
+          title="YouTube video player" 
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+          allowfullscreen>
+        </iframe>
       </div>
       
       <div class="volume-container">
-        <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5" oninput="changeVolume(this.value)">
+        <input type="range" class="volume-slider" min="0" max="1" step="0.1" value="0.5">
         <span class="volume-label">音量</span>
       </div>
     </div>
 
     <div class="action-bar">
       <button class="btn-action">裁剪</button>
-      <button class="btn-action" onclick="togglePlay()">播放 / 暂停</button>
+      <button class="btn-action">播放 / 暂停</button>
       <button class="btn-action">保存</button>
     </div>
 
+  </div>
+
+  <div class="modal-overlay" id="add-modal">
+    <div class="modal-box">
+      <h3>添加新视频 / 新类目</h3>
+      
+      <select id="modal-category-select" onchange="toggleNewCategoryInput(this.value)">
+        </select>
+      
+      <input type="text" id="modal-new-category-input" placeholder="输入新类目名称..." style="display: none;">
+      <input type="text" id="modal-video-title" placeholder="视频标题 (如: 定时白噪音)">
+      <input type="text" id="modal-video-url" placeholder="粘贴 YouTube 视频链接/ID">
+      
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeAddModal()">取消</button>
+        <button class="btn-confirm" onclick="saveNewVideo()">添加</button>
+      </div>
+    </div>
   </div>
 
   <nav class="bottom-nav">
@@ -295,30 +394,175 @@
   </nav>
 
   <script>
-    const video = document.getElementById('main-video');
+    // 所有板块与其下的 YouTube 视频数据
+    let categoriesData = {
+      "人声&口腔音": [
+        { title: "口腔音 01", id: "a0tl9k3deV0" },
+        { title: "口腔音 02", id: "mfDl72i3k-g" },
+        { title: "口腔音 03", id: "0GBnppu5PR8" },
+        { title: "口腔音 04", id: "t4WJHx2-Pvo" }
+      ],
+      "白噪音": [
+        { title: "白噪音 01", id: "0aay6rLcEdU" },
+        { title: "白噪音 02", id: "yT3ELvaGu0Y" },
+        { title: "白噪音 03", id: "SIV08epFmDQ" },
+        { title: "白噪音 04", id: "Qhll2RJXJOU" },
+        { title: "白噪音 05", id: "D-td0OEk0HY" }
+      ],
+      "场景扮演": [
+        { title: "角色扮演 01", id: "S2OhZsgKT3c" },
+        { title: "角色扮演 02", id: "xdZ3zmM16Nk" },
+        { title: "角色扮演 03", id: "IyJOGveGf7Y" },
+        { title: "角色扮演 04", id: "9Rk07cpLrZs" },
+        { title: "角色扮演 05", id: "8oksfOGH6Uo" }
+      ],
+      "敲击音": [
+        { title: "敲击音 01", id: "QkpygCY47ME" },
+        { title: "敲击音 02", id: "qe7E6J35E3s" },
+        { title: "敲击音 03", id: "Om9yQb2YuEA" },
+        { title: "敲击音 04", id: "cXogEZUIa1U" }
+      ]
+    };
 
-    // 音量调节
-    function changeVolume(val) {
-      video.volume = val;
-      if (val > 0) video.muted = false;
+    let currentCategory = "人声&口腔音";
+
+    // 初始化渲染页面
+    function initApp() {
+      renderCategories();
+      renderVideos(currentCategory);
     }
 
-    // 播放/暂停切换
-    function togglePlay() {
-      if (video.paused) {
-        video.play();
-      } else {
-        video.pause();
+    // 渲染类目 Chips
+    function renderCategories() {
+      const container = document.getElementById('category-container');
+      container.innerHTML = '';
+      
+      Object.keys(categoriesData).forEach(catName => {
+        const chip = document.createElement('div');
+        chip.className = `chip ${catName === currentCategory ? 'active' : ''}`;
+        chip.innerText = catName;
+        chip.onclick = () => switchCategory(catName);
+        container.appendChild(chip);
+      });
+    }
+
+    // 切换当前选中类目
+    function switchCategory(catName) {
+      currentCategory = catName;
+      renderCategories();
+      renderVideos(catName);
+    }
+
+    // 渲染对应类目下的视频卡片
+    function renderVideos(catName) {
+      const container = document.getElementById('video-list-container');
+      container.innerHTML = '';
+
+      const videos = categoriesData[catName] || [];
+      videos.forEach((video) => {
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.onclick = () => playYouTube(video.id);
+        card.innerHTML = `${video.title}<span>点击播放</span>`;
+        container.appendChild(card);
+      });
+    }
+
+    // 提取 YouTube 视频 ID 函数
+    function getYouTubeId(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = url.match(regExp);
+      if (match && match[2].length === 11) {
+        return match[2];
       }
+      return url.length === 11 ? url : null; // 支持直接粘贴 11位 ID
     }
 
-    // 定时器简易逻辑 (30m, 1h, 1.5h)
-    let timerState = 0;
-    const times = ["关", "30min", "1h", "1.5h"];
-    function setTimer() {
-      timerState = (timerState + 1) % times.length;
-      document.getElementById('timer-btn').innerText = `⏱ 定时: ${times[timerState]}`;
+    // 点击卡片或搜索播放 YouTube 视频
+    function playYouTube(videoId) {
+      const player = document.getElementById('youtube-player');
+      player.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&loop=1&playlist=${videoId}`;
     }
+
+    // 搜索框直接粘贴网址播放
+    function handleUrlPaste(val) {
+      const videoId = getYouTubeId(val);
+      if (videoId) playYouTube(videoId);
+    }
+
+    // ---------------- 弹窗逻辑 (自定义添加类目与视频) ----------------
+    function openAddModal() {
+      const select = document.getElementById('modal-category-select');
+      select.innerHTML = '';
+      
+      // 填充现有的类目选项
+      Object.keys(categoriesData).forEach(cat => {
+        select.innerHTML += `<option value="${cat}">${cat}</option>`;
+      });
+      select.innerHTML += `<option value="NEW">+ 新建类目...</option>`;
+      
+      toggleNewCategoryInput(select.value);
+      document.getElementById('add-modal').style.display = 'flex';
+    }
+
+    function closeAddModal() {
+      document.getElementById('add-modal').style.display = 'none';
+      document.getElementById('modal-video-title').value = '';
+      document.getElementById('modal-video-url').value = '';
+      document.getElementById('modal-new-category-input').value = '';
+    }
+
+    function toggleNewCategoryInput(val) {
+      const newInput = document.getElementById('modal-new-category-input');
+      newInput.style.display = (val === 'NEW') ? 'block' : 'none';
+    }
+
+    function saveNewVideo() {
+      const selectVal = document.getElementById('modal-category-select').value;
+      const newCatVal = document.getElementById('modal-new-category-input').value.trim();
+      const titleVal = document.getElementById('modal-video-title').value.trim() || "自定义视频";
+      const urlVal = document.getElementById('modal-video-url').value.trim();
+
+      const videoId = getYouTubeId(urlVal);
+      if (!videoId) {
+        alert("请输入有效的 YouTube 网址或 11 位视频 ID");
+        return;
+      }
+
+      let targetCat = selectVal;
+      if (selectVal === 'NEW') {
+        if (!newCatVal) {
+          alert("请输入新类目名称");
+          return;
+        }
+        targetCat = newCatVal;
+        if (!categoriesData[targetCat]) {
+          categoriesData[targetCat] = [];
+        }
+      }
+
+      // 添加到对应的类目数据列表中
+      categoriesData[targetCat].push({ title: titleVal, id: videoId });
+
+      // 切换到新添加的类目并播放视频
+      currentCategory = targetCat;
+      renderCategories();
+      renderVideos(targetCat);
+      playYouTube(videoId);
+
+      closeAddModal();
+    }
+
+    // ---------------- 定时器逻辑 ----------------
+    let timerIndex = 0;
+    const timerOptions = ["关", "30min", "1h", "1.5h"];
+    function setTimer() {
+      timerIndex = (timerIndex + 1) % timerOptions.length;
+      document.getElementById('timer-btn').innerText = `⏱ 定时: ${timerOptions[timerIndex]}`;
+    }
+
+    // 页面加载完成后初始化
+    window.onload = initApp;
   </script>
 </body>
 </html>
