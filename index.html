@@ -5,10 +5,87 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>今晚怎么睡？🌙</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* 情绪选择区域平滑过渡动画 */
+    .mood-container {
+      transition: all 0.5s ease;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .mood-container.fade-out {
+      opacity: 0;
+      transform: translateY(-20px);
+      pointer-events: none;
+    }
+
+    /* 情绪响应文案卡片 */
+    .response-card {
+      display: none;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease;
+      background: rgba(255, 255, 255, 0.12);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 20px;
+      padding: 30px 20px;
+      text-align: center;
+      margin-top: 10px;
+    }
+    .response-card.fade-in {
+      display: block;
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .response-text {
+      font-size: 18px;
+      color: #ffffff;
+      font-weight: 500;
+      letter-spacing: 1px;
+      line-height: 1.6;
+    }
+
+    /* 情绪选项网格样式微调 */
+    .mood-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      margin-top: 12px;
+    }
+    .mood-btn {
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 20px 8px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .mood-btn:active {
+      transform: scale(0.95);
+      background: rgba(255, 255, 255, 0.25);
+    }
+    .mood-btn .icon {
+      font-size: 24px;
+    }
+    .mood-btn h4 {
+      font-size: 13px;
+      color: #ffffff;
+      font-weight: 500;
+    }
+  </style>
 </head>
 <body>
+
   <div class="video-background">
-    <video autoplay loop playsinline>
+    <video autoplay loop playsinline muted>
       <source src="./home.mp4" type="video/mp4">
     </video>
     <div class="overlay"></div>
@@ -23,75 +100,77 @@
     </header>
 
     <section class="mood-section">
-      <h3 class="section-title">选择今晚的情绪</h3>
-      <div class="grid-container">
-        
-        <div class="card" onclick="toggleAudio()">
-          <span class="icon">🌧</span>
-          <h4>放松</h4>
-          <p>缓解压力</p>
-        </div>
+      <h3 class="section-title">今天心情如何？</h3>
+      
+      <div class="mood-container" id="mood-options">
+        <div class="mood-grid">
+          
+          <div class="mood-btn" onclick="handleMoodSelect('good')">
+            <span class="icon">😊</span>
+            <h4>非常好</h4>
+          </div>
 
-        <div class="card">
-          <span class="icon">🌌</span>
-          <h4>深度睡眠</h4>
-          <p>更快入睡</p>
-        </div>
+          <div class="mood-btn" onclick="handleMoodSelect('good')">
+            <span class="icon">😌</span>
+            <h4>还不错</h4>
+          </div>
 
-        <div class="card">
-          <span class="icon">🌲</span>
-          <h4>恢复自身磁场</h4>
-          <p>自然白噪音修复</p>
-        </div>
+          <div class="mood-btn" onclick="handleMoodSelect('bad')">
+            <span class="icon">🌧</span>
+            <h4>真是太糟糕了</h4>
+          </div>
 
-        <div class="card">
-          <span class="icon">☁️</span>
-          <h4>情景入睡</h4>
-          <p>选择沉浸式场景</p>
         </div>
+      </div>
 
+      <div class="response-card" id="response-card">
+        <p class="response-text" id="response-text"></p>
       </div>
     </section>
   </main>
 
   <nav class="bottom-nav">
-    <a href="#" class="nav-item active">
+    <a href="index.html" class="nav-item active">
       <span class="nav-icon">🌙</span>
       <span>主页</span>
     </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">🔍</span>
-      <span>搜索</span>
-    </a>
-    <a href="#" class="nav-item">
+    <a href="create.html" class="nav-item">
       <span class="nav-icon">＋</span>
       <span>创作</span>
     </a>
-    <a href="#" class="nav-item">
-      <span class="nav-icon">♡</span>
-      <span>保存</span>
-    </a>
-    <a href="#" class="nav-item">
+    <a href="my.html" class="nav-item">
       <span class="nav-icon">👤</span>
       <span>我的</span>
     </a>
   </nav>
 
   <script>
-    // 点击卡片控制雨声播放/暂停
-    function toggleAudio() {
-      const audio = document.getElementById('bg-audio');
-      if (audio.paused) {
-        audio.play();
+    function handleMoodSelect(type) {
+      const optionsBox = document.getElementById('mood-options');
+      const responseCard = document.getElementById('response-card');
+      const responseText = document.getElementById('response-text');
+
+      // 1. 设置文案内容
+      if (type === 'good') {
+        responseText.innerText = "真不错，调个asmr睡觉吧~ ✨";
       } else {
-        audio.pause();
+        responseText.innerText = "没关系，调个喜欢的asmr入睡吧~ 🌙";
       }
+
+      // 2. 情绪选择部分淡出弹出
+      optionsBox.classList.add('fade-out');
+
+      // 3. 延迟 300ms 后显示温暖回应文案
+      setTimeout(() => {
+        optionsBox.style.display = 'none';
+        responseCard.classList.add('fade-in');
+      }, 300);
+
+      // 4. 停留 1.5 秒后跳转到“创作”页面
+      setTimeout(() => {
+        window.location.href = "create.html";
+      }, 1800);
     }
   </script>
 </body>
 </html>
-<a href="create.html" class="nav-item">
-  <span class="nav-icon">＋</span>
-  <span>创作</span>
-</a>
-
