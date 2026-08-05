@@ -6,8 +6,78 @@
   <title>今晚怎么睡？🌙</title>
   <link rel="stylesheet" href="style.css">
   <style>
-    /* 情绪选择区域平滑过渡动画 */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% -20%, #2e1065 0%, #0f172a 65%);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    /* 容器：垂直分布，让内容天然在屏幕中部居中 */
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* 核心：垂直居中 */
+      align-items: center;
+      padding: 20px 24px 80px; /* 留出底部导航栏高度 */
+      position: relative;
+      z-index: 10;
+    }
+
+    /* 头部 Title 区域 */
+    .header {
+      text-align: center;
+      margin-bottom: 24px;
+    }
+    .moon-icon {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+    .header h1 {
+      font-size: 26px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+    }
+    .welcome {
+      font-size: 20px;
+      font-weight: 300;
+      color: rgba(255, 255, 255, 0.85);
+      margin-top: 4px;
+    }
+    .sub-title {
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.6);
+      margin-top: 10px;
+    }
+
+    /* 心情选择主要区域 */
+    .mood-section {
+      width: 100%;
+      text-align: center;
+    }
+    .section-title {
+      font-size: 18px;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #ffffff;
+    }
+
+    /* 情绪容器与动画 */
     .mood-container {
+      width: 100%;
       transition: all 0.5s ease;
       opacity: 1;
       transform: translateY(0);
@@ -16,6 +86,43 @@
       opacity: 0;
       transform: translateY(-20px);
       pointer-events: none;
+    }
+
+    /* 🌟 纵向单列胶囊按钮布局 (完全贴合原型图) */
+    .mood-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      width: 100%;
+    }
+    .mood-btn {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 25px; /* 长条圆角胶囊 */
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    }
+    .mood-btn:active {
+      transform: scale(0.96);
+      background: rgba(255, 255, 255, 0.2);
+      border-color: rgba(255, 255, 255, 0.4);
+    }
+    .mood-btn .icon {
+      font-size: 18px;
+    }
+    .mood-btn h4 {
+      font-size: 14px;
+      color: #ffffff;
+      font-weight: 400;
+      letter-spacing: 0.5px;
     }
 
     /* 情绪响应文案卡片 */
@@ -29,9 +136,9 @@
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 20px;
-      padding: 30px 20px;
+      padding: 24px 20px;
       text-align: center;
-      margin-top: 10px;
+      width: 100%;
     }
     .response-card.fade-in {
       display: block;
@@ -39,46 +146,41 @@
       transform: translateY(0);
     }
     .response-text {
-      font-size: 18px;
+      font-size: 15px;
       color: #ffffff;
       font-weight: 500;
-      letter-spacing: 1px;
       line-height: 1.6;
     }
 
-    /* 情绪选项网格样式微调 */
-    .mood-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 10px;
-      margin-top: 12px;
+    /* 底部导航栏 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      max-width: 430px;
+      height: 65px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
     }
-    .mood-btn {
-      background: rgba(255, 255, 255, 0.1);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 16px;
-      padding: 20px 8px;
+    .nav-item {
       display: flex;
       flex-direction: column;
       align-items: center;
-      justify-content: center;
-      gap: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
+      text-decoration: none;
+      color: rgba(255, 255, 255, 0.45);
+      font-size: 12px;
+      gap: 4px;
     }
-    .mood-btn:active {
-      transform: scale(0.95);
-      background: rgba(255, 255, 255, 0.25);
-    }
-    .mood-btn .icon {
-      font-size: 24px;
-    }
-    .mood-btn h4 {
-      font-size: 13px;
+    .nav-item.active {
       color: #ffffff;
-      font-weight: 500;
+      font-weight: bold;
     }
   </style>
 </head>
@@ -94,20 +196,20 @@
   <main class="app-container">
     <header class="header">
       <div class="moon-icon">🌙</div>
-      <h1>Good Night</h1>
-      <p class="welcome">Welcome back,</p>
-      <h2>今晚你需要哪类睡眠？</h2>
+      <h1>GOOD NIGHT</h1>
+      <p class="welcome">welcome back</p>
+      <p class="sub-title">今天怎么睡？</p>
     </header>
 
     <section class="mood-section">
       <h3 class="section-title">今天心情如何？</h3>
       
       <div class="mood-container" id="mood-options">
-        <div class="mood-grid">
+        <div class="mood-list">
           
           <div class="mood-btn" onclick="handleMoodSelect('good')">
             <span class="icon">😊</span>
-            <h4>非常好</h4>
+            <h4>非常好！</h4>
           </div>
 
           <div class="mood-btn" onclick="handleMoodSelect('good')">
@@ -117,7 +219,7 @@
 
           <div class="mood-btn" onclick="handleMoodSelect('bad')">
             <span class="icon">🌧</span>
-            <h4>真是太糟糕了</h4>
+            <h4>真是太糟糕了…</h4>
           </div>
 
         </div>
@@ -150,23 +252,23 @@
       const responseCard = document.getElementById('response-card');
       const responseText = document.getElementById('response-text');
 
-      // 1. 设置文案内容
+      // 1. 设置文案
       if (type === 'good') {
-        responseText.innerText = "真不错，调个asmr睡觉吧~ ✨";
+        responseText.innerText = "真不错，调个喜欢的声音好好休息吧~ ✨";
       } else {
-        responseText.innerText = "没关系，调个喜欢的asmr入睡吧~ 🌙";
+        responseText.innerText = "没关系，今晚做个好梦，调个喜欢的 ASMR 入睡吧~ 🌙";
       }
 
-      // 2. 情绪选择部分淡出弹出
+      // 2. 选项淡出
       optionsBox.classList.add('fade-out');
 
-      // 3. 延迟 300ms 后显示温暖回应文案
+      // 3. 延迟显示文案
       setTimeout(() => {
         optionsBox.style.display = 'none';
         responseCard.classList.add('fade-in');
       }, 300);
 
-      // 4. 停留 1.5 秒后跳转到“创作”页面
+      // 4. 1.8 秒后跳转创作页面
       setTimeout(() => {
         window.location.href = "create.html";
       }, 1800);
