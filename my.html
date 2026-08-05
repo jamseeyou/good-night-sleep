@@ -31,7 +31,7 @@
       position: relative;
     }
 
-    /* 移动端主内容容器 (利用 Flex 垂直居中内容组件) */
+    /* 移动端主内容容器 */
     .app-container {
       width: 100%;
       max-width: 430px;
@@ -39,7 +39,7 @@
       background: transparent;
       display: flex;
       flex-direction: column;
-      justify-content: center;              /* 核心修改：让播放器等主体垂直居于屏幕中部 */
+      justify-content: center;              /* 让主体垂直居于屏幕中部 */
       padding: 20px 16px 100px;             /* 底部留出悬浮播放按钮与导航栏空间 */
       gap: 20px;
       position: relative;
@@ -91,7 +91,7 @@
 
     /* 2. 随机一句话：字号加大、居中 */
     .random-quote {
-      font-size: 15px;                      /* 字号加大 */
+      font-size: 15px;
       font-weight: 500;
       color: rgba(255, 255, 255, 0.9);
       text-align: center;
@@ -103,7 +103,7 @@
     /* 3. 主视频预览区（居于屏幕中心区域） */
     .draft-display {
       width: 100%;
-      height: 210px;                         /* 适当调大主卡片比例 */
+      height: 210px;
       background: rgba(15, 23, 42, 0.45);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 20px;
@@ -122,6 +122,28 @@
       height: 100%;
       object-fit: cover;
     }
+    .project-info-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.85));
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+    .project-info-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: #fff;
+    }
+    .project-info-sub {
+      font-size: 11px;
+      color: rgba(255,255,255,0.7);
+      margin-top: 2px;
+    }
+
     .empty-display-hint {
       position: absolute;
       font-size: 13px;
@@ -239,6 +261,54 @@
       transform: scale(0.96);
     }
 
+    /* 🎬 播放器弹窗 Modal */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      display: none;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      width: 90%;
+      max-width: 400px;
+      background: #0f172a;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      position: relative;
+    }
+    .close-modal {
+      position: absolute;
+      top: -12px;
+      right: -12px;
+      width: 30px;
+      height: 30px;
+      background: #ef4444;
+      color: white;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .player-iframe {
+      width: 100%;
+      height: 220px;
+      border-radius: 12px;
+      border: none;
+    }
+
     /* 底部固定导航栏 */
     .bottom-nav {
       position: fixed;
@@ -280,7 +350,8 @@
       <div class="top-bar-my">
         <a href="create.html" class="back-to-create">← 去创作</a>
         <div class="title-goodnight">Good Night</div>
-        <div></div> </div>
+        <div></div>
+      </div>
       <p class="random-quote" id="random-quote">你很安全，你被爱着，现在可以安心休息</p>
     </header>
 
@@ -298,6 +369,14 @@
 
   <div class="planet-player-wrapper">
     <button class="play-btn-capsule" onclick="playSelectedDateProject()">播放该日ASMR工程</button>
+  </div>
+
+  <div class="modal-overlay" id="playerModal">
+    <div class="modal-content">
+      <div class="close-modal" onclick="closePlayerModal()">✕</div>
+      <iframe id="youtube-player" class="player-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <div style="font-size:12px; color:rgba(255,255,255,0.7); text-align:center;" id="playing-status">正在准备播放...</div>
+    </div>
   </div>
 
   <nav class="bottom-nav">
@@ -331,6 +410,23 @@
     let currentDateIndex = 9; // 默认选中最后一天（今天）
     let availableDates = [];
 
+    // 辅助：获取本地时间 YYYY-MM-DD（避免 ISO UTC 跨时区导致的 Key 错位）
+    function getLocalDateString(dateObj) {
+      const year = dateObj.getFullYear();
+      const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+      const day = String(dateObj.getDate()).padStart(2, '0');
+      return `${year}-${month}-${day}`;
+    }
+
+    // 辅助：尝试解析并抓取标准的 YouTube VideoID
+    function extractYouTubeId(urlOrId) {
+      if (!urlOrId) return null;
+      if (urlOrId.length === 11 && !urlOrId.includes('/')) return urlOrId;
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+      const match = urlOrId.match(regExp);
+      return (match && match[2].length === 11) ? match[2] : urlOrId;
+    }
+
     // 初始化
     function initMyPage() {
       // 1. 设置随机句子
@@ -353,15 +449,16 @@
       for (let i = 9; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
+        const dateStr = getLocalDateString(d);
         availableDates.push({
           dateObj: d,
           dayNum: d.getDate(),
           monthLabel: (d.getMonth() + 1) + '/' + d.getDate(),
-          storageKey: `asmr_project_${d.toISOString().split('T')[0]}`
+          storageKey: `asmr_project_${dateStr}`
         });
       }
 
-      // 渲染
+      // 渲染月球节点
       availableDates.forEach((date, idx) => {
         const moon = document.createElement('div');
         moon.className = `moon-date ${idx === currentDateIndex ? 'active' : ''}`;
@@ -383,32 +480,103 @@
       generateDateMoons(); 
     }
 
-    // 读取并加载指定日期的视频工程封面图
+    // 读取并加载指定日期的视频工程封面图与详细数据
     function loadProjectForDate(index) {
       const display = document.getElementById('draft-display');
       const dateData = availableDates[index];
       
-      const projectData = localStorage.getItem(dateData.storageKey);
-
-      if (projectData) {
-        display.innerHTML = '<img src="path/to/project_cover.jpg" alt="project cover">';
-      } else {
-        display.innerHTML = `<div class="empty-display-hint">
-          ${dateData.monthLabel}该日期暂无剪辑工程。<br>去“创作”页面剪辑并保存一个吧！
-        </div>`;
+      // 尝试获取存储数据
+      let rawData = localStorage.getItem(dateData.storageKey);
+      
+      // 容错：如果当天Key没有，尝试读取默认工程 key 'my_asmr_project'
+      if (!rawData && index === 9) {
+        rawData = localStorage.getItem('my_asmr_project') || localStorage.getItem('asmr_timeline');
       }
+
+      if (rawData) {
+        try {
+          const parsed = JSON.parse(rawData);
+          // 适配可能的数据格式（数组或包含 timeline 的对象）
+          const timeline = Array.isArray(parsed) ? parsed : (parsed.timeline || parsed.clips || []);
+
+          if (timeline.length > 0) {
+            // 获取第一个片段的 YouTube ID 作为主封面
+            const firstClip = timeline[0];
+            const videoId = extractYouTubeId(firstClip.videoId || firstClip.id || firstClip.url);
+            const coverUrl = videoId ? `https://img.youtube.com/vi/${videoId}/hqdefault.jpg` : '';
+
+            display.innerHTML = `
+              <img src="${coverUrl}" alt="Project Cover" onerror="this.style.display='none'">
+              <div class="project-info-overlay">
+                <div>
+                  <div class="project-info-title">💤 ${dateData.monthLabel} 专属助眠歌单</div>
+                  <div class="project-info-sub">包含 ${timeline.length} 个音视频切片</div>
+                </div>
+              </div>
+            `;
+            return;
+          }
+        } catch (e) {
+          console.error("解析工程数据失败", e);
+        }
+      }
+
+      // 无数据时的默认显示
+      display.innerHTML = `<div class="empty-display-hint">
+        ${dateData.monthLabel} 该日期暂无剪辑工程。<br>去“创作”页面剪辑并保存一个吧！
+      </div>`;
     }
 
     // 播放指定日期的工程
     function playSelectedDateProject() {
       const dateData = availableDates[currentDateIndex];
-      const projectData = localStorage.getItem(dateData.storageKey);
-
-      if (projectData) {
-        alert(`🎬 开始顺序播放 ${dateData.monthLabel} 的助眠工程...`);
-      } else {
-        alert(`该日期暂无保存的工程，请点击上方去创作。`);
+      let rawData = localStorage.getItem(dateData.storageKey);
+      if (!rawData && currentDateIndex === 9) {
+        rawData = localStorage.getItem('my_asmr_project') || localStorage.getItem('asmr_timeline');
       }
+
+      if (!rawData) {
+        alert(`该日期暂无保存的工程，请点击上方“去创作”吧！`);
+        return;
+      }
+
+      try {
+        const parsed = JSON.parse(rawData);
+        const timeline = Array.isArray(parsed) ? parsed : (parsed.timeline || parsed.clips || []);
+
+        if (timeline.length === 0) {
+          alert(`工程数据为空，请重新创作。`);
+          return;
+        }
+
+        // 打开 Modal 弹窗并加载首个片段
+        const modal = document.getElementById('playerModal');
+        const iframe = document.getElementById('youtube-player');
+        const status = document.getElementById('playing-status');
+
+        const firstClip = timeline[0];
+        const videoId = extractYouTubeId(firstClip.videoId || firstClip.id || firstClip.url);
+        const start = parseInt(firstClip.start || firstClip.startTime || 0);
+        const end = firstClip.end ? parseInt(firstClip.end) : null;
+
+        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&start=${start}`;
+        if (end) embedUrl += `&end=${end}`;
+
+        iframe.src = embedUrl;
+        status.innerText = `正在播放 第 1/${timeline.length} 个片段`;
+        modal.style.display = 'flex';
+
+      } catch (e) {
+        alert(`工程解析异常，请重新保存。`);
+      }
+    }
+
+    // 关闭播放弹窗
+    function closePlayerModal() {
+      const modal = document.getElementById('playerModal');
+      const iframe = document.getElementById('youtube-player');
+      iframe.src = ''; // 停止播放
+      modal.style.display = 'none';
     }
 
     window.onload = initMyPage;
