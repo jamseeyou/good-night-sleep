@@ -4,7 +4,6 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>今晚怎么睡？🌙</title>
-  <link rel="stylesheet" href="style.css">
   <style>
     * {
       margin: 0;
@@ -16,7 +15,7 @@
     body {
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at 50% -20%, #2e1065 0%, #0f172a 65%);
+      background: #0f172a;
       color: #ffffff;
       display: flex;
       justify-content: center;
@@ -24,16 +23,15 @@
       position: relative;
     }
 
-    /* 🌟 全屏背景视频样式 */
+    /* 🌟 修复后的背景视频：确保在最底层，且不会拦截点击 */
     .video-background {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: 1;
+      z-index: -1; /* 关键：放到最底层，绝不遮挡文字和按钮 */
       overflow: hidden;
-      pointer-events: none; /* 让点击穿透视频，保证按钮可以正常点击 */
     }
     .video-background video {
       width: 100%;
@@ -46,22 +44,22 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.45); /* 调暗遮罩，确保文字清晰可见 */
+      background: rgba(15, 23, 42, 0.45); /* 压暗视频背景，让文字清晰 */
       backdrop-filter: blur(2px);
     }
 
-    /* 容器：垂直分布，让内容天然在屏幕中部居中 */
+    /* 容器：垂直分布，让内容在屏幕中部居中 */
     .app-container {
       width: 100%;
       max-width: 430px;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* 核心：垂直居中 */
+      justify-content: center; 
       align-items: center;
-      padding: 20px 24px 80px; /* 留出底部导航栏高度 */
+      padding: 20px 24px 80px; 
       position: relative;
-      z-index: 10;
+      z-index: 10; /* 确保内容在视频上方 */
     }
 
     /* 头部 Title 区域 */
@@ -115,7 +113,7 @@
       pointer-events: none;
     }
 
-    /* 🌟 纵向单列胶囊按钮布局 */
+    /* 纵向单列胶囊按钮布局 */
     .mood-list {
       display: flex;
       flex-direction: column;
@@ -274,13 +272,12 @@
   </nav>
 
   <script>
-    // 浏览器安全策略：首次加载时尝试取消静音播放声音
+    // 浏览器安全策略：尝试自动播放有声视频，如被拦截则监听首次点击解锁声音
     window.addEventListener('DOMContentLoaded', () => {
       const video = document.getElementById('bg-video');
       video.muted = false;
       video.play().catch(error => {
-        // 如果浏览器拦截了有声自动播放，监听用户的第一次点击自动恢复声音
-        console.log("浏览器拦截了自动声音播放，等待用户交互解锁...");
+        console.log("浏览器拦截了有声自动播放，等待用户交互解锁...");
         const unlockAudio = () => {
           video.muted = false;
           video.play();
@@ -297,23 +294,19 @@
       const responseCard = document.getElementById('response-card');
       const responseText = document.getElementById('response-text');
 
-      // 1. 设置文案
       if (type === 'good') {
         responseText.innerText = "真不错，调个喜欢的声音好好休息吧~ ✨";
       } else {
         responseText.innerText = "没关系，今晚做个好梦，调个喜欢的 ASMR 入睡吧~ 🌙";
       }
 
-      // 2. 选项淡出
       optionsBox.classList.add('fade-out');
 
-      // 3. 延迟显示文案
       setTimeout(() => {
         optionsBox.style.display = 'none';
         responseCard.classList.add('fade-in');
       }, 300);
 
-      // 4. 1.8 秒后跳转创作页面
       setTimeout(() => {
         window.location.href = "create.html";
       }, 1800);
