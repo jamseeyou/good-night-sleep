@@ -3,7 +3,709 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>创作 - 今晚怎么睡？🌙</title><!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>创作 - 今晚怎么睡？🌙</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    /* 深夜极光弥散渐变背景 */
+    body {
+      width: 100vw;
+      height: 100vh;
+      background: radial-gradient(circle at 50% -20%, #2e1065 0%, #0f172a 65%);
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .app-container {
+      width: 100%;
+      max-width: 430px;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      padding: 14px 14px 80px;
+      overflow-y: auto;
+      gap: 12px;
+      position: relative;
+    }
+
+    /* 1. 顶部搜索 / URL 粘贴 */
+    .search-bar {
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 20px;
+      padding: 8px 14px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .search-bar input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: white;
+      width: 100%;
+      font-size: 13px;
+    }
+    .search-bar input::placeholder { color: rgba(255, 255, 255, 0.45); }
+
+    /* 2. 分类横向滑动 */
+    .category-scroll {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      white-space: nowrap;
+      scrollbar-width: none;
+    }
+    .category-scroll::-webkit-scrollbar { display: none; }
+    
+    .chip {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 14px;
+      padding: 6px 14px;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.75);
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+    .chip.active {
+      background: rgba(255, 255, 255, 0.25);
+      border-color: rgba(255, 255, 255, 0.8);
+      color: #ffffff;
+      font-weight: 600;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.25);
+    }
+    .chip-add {
+      background: rgba(99, 102, 241, 0.25);
+      border: 1px dashed rgba(165, 180, 252, 0.6);
+      color: #c7d2fe;
+    }
+
+    /* 3. 视频选择列表 */
+    .video-list {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      min-height: 95px;
+      align-items: center;
+    }
+    .video-list::-webkit-scrollbar { display: none; }
+
+    .add-video-btn-card {
+      min-width: 80px;
+      height: 90px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px dashed rgba(255, 255, 255, 0.25);
+      border-radius: 12px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 11px;
+      gap: 4px;
+    }
+
+    .video-card {
+      width: 125px;
+      height: 90px;
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 12px;
+      overflow: hidden;
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      cursor: pointer;
+    }
+    .video-card img {
+      width: 100%;
+      height: 58px;
+      object-fit: cover;
+    }
+    .video-card .title {
+      padding: 4px 6px;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.9);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* 4. 视频播放器 (预览区) */
+    .player-section {
+      width: 100%;
+      height: 200px;
+      background: #000000;
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      border-radius: 16px;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.2);
+    }
+    .player-section iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+    }
+    .playing-status-tag {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 4px 10px;
+      border-radius: 8px;
+      font-size: 10px;
+      color: #60a5fa;
+      border: 1px solid rgba(96, 165, 250, 0.4);
+      pointer-events: none;
+      z-index: 5;
+    }
+
+    /* 5. 剪映风格：单轨时间线 (Timeline Section) */
+    .timeline-section {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 16px;
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .timeline-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12px;
+      color: rgba(255, 255, 255, 0.8);
+    }
+    
+    /* 时间线轨道容器 */
+    .timeline-track {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 6px 2px;
+      scrollbar-width: none;
+      min-height: 70px;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 12px;
+      border: 1px inset rgba(255, 255, 255, 0.05);
+    }
+    .timeline-track::-webkit-scrollbar { display: none; }
+
+    /* 片段 (Clip) 卡片 */
+    .clip-item {
+      background: linear-gradient(135deg, rgba(99, 102, 241, 0.3), rgba(59, 130, 246, 0.2));
+      border: 1px solid rgba(165, 180, 252, 0.4);
+      border-radius: 10px;
+      padding: 8px 10px;
+      min-width: 120px;
+      flex-shrink: 0;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .clip-item.active {
+      border-color: #4ade80;
+      box-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
+      background: linear-gradient(135deg, rgba(74, 222, 128, 0.25), rgba(59, 130, 246, 0.2));
+    }
+    .clip-item .clip-title {
+      font-size: 11px;
+      color: #ffffff;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 90px;
+    }
+    .clip-item .clip-time {
+      font-size: 9px;
+      color: rgba(255, 255, 255, 0.7);
+    }
+    .clip-del-btn {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 18px;
+      height: 18px;
+      background: rgba(239, 68, 68, 0.6);
+      border-radius: 50%;
+      color: white;
+      font-size: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .empty-timeline-hint {
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.4);
+      width: 100%;
+      text-align: center;
+    }
+
+    /* 6. 底部操作按钮 */
+    .action-bar {
+      display: flex;
+      gap: 12px;
+      margin-top: 4px;
+    }
+    .btn-action {
+      flex: 1;
+      background: rgba(255, 255, 255, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 14px;
+      padding: 12px 0;
+      color: white;
+      font-size: 13px;
+      cursor: pointer;
+      text-align: center;
+    }
+    .btn-action.primary {
+      background: linear-gradient(135deg, #6366f1 0%, #3b82f6 100%);
+      border: 1px solid rgba(165, 180, 252, 0.4);
+      box-shadow: 0 4px 15px rgba(59, 130, 246, 0.35);
+      font-weight: 500;
+    }
+
+    /* 弹窗样式 */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(0, 0, 0, 0.75);
+      backdrop-filter: blur(10px);
+      z-index: 200;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-box {
+      width: 85%;
+      max-width: 360px;
+      background: rgba(30, 41, 59, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    .modal-box h3 { font-size: 15px; text-align: center; }
+    .modal-box input {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 10px;
+      color: white;
+      font-size: 13px;
+      outline: none;
+    }
+    .modal-btns { display: flex; gap: 10px; margin-top: 6px; }
+    .modal-btns button {
+      flex: 1; padding: 10px; border-radius: 10px; border: none; font-size: 13px; cursor: pointer;
+    }
+    .btn-confirm { background: #3b82f6; color: white; }
+    .btn-cancel { background: rgba(255, 255, 255, 0.15); color: white; }
+
+    /* 底部导航 */
+    .bottom-nav {
+      position: fixed;
+      bottom: 0; left: 50%;
+      transform: translateX(-50%);
+      width: 100%; max-width: 430px;
+      height: 65px;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(20px);
+      border-top: 1px solid rgba(255, 255, 255, 0.12);
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      z-index: 100;
+    }
+    .nav-item {
+      display: flex; flex-direction: column; align-items: center;
+      text-decoration: none; color: rgba(255, 255, 255, 0.45); font-size: 12px; gap: 4px;
+    }
+    .nav-item.active { color: #ffffff; font-weight: bold; }
+  </style>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <div class="search-bar">
+      🔍 <input type="text" placeholder="粘贴 YouTube 链接或视频 ID..." oninput="handleUrlPaste(this.value)">
+    </div>
+
+    <div class="category-scroll" id="category-container"></div>
+
+    <div class="video-list" id="video-list-container"></div>
+
+    <div class="player-section">
+      <iframe id="youtube-player" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      <div class="playing-status-tag" id="playing-status">🎬 未加载片段</div>
+    </div>
+
+    <div class="timeline-section">
+      <div class="timeline-header">
+        <span>🎞 单轨时间线 (按顺序拼接)</span>
+        <span id="timeline-duration" style="font-size:10px; color:#4ade80;">总长: 0 秒</span>
+      </div>
+      
+      <div class="timeline-track" id="timeline-track">
+        <div class="empty-timeline-hint">点击上方视频卡片截取并添加片段</div>
+      </div>
+    </div>
+
+    <div class="action-bar">
+      <button class="btn-action" onclick="playTimelineFromStart()">▶️ 顺序预览播放</button>
+      <button class="btn-action primary" onclick="saveToMyDrafts()">💾 保存工程到“我的”</button>
+    </div>
+
+  </div>
+
+  <div class="modal-overlay" id="trim-add-modal">
+    <div class="modal-box">
+      <h3 id="trim-modal-title">截取视频片段</h3>
+      <p style="font-size: 11px; color: rgba(255,255,255,0.6); text-align: center;">设置截取的起止时间（单位：秒）</p>
+      
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <label style="font-size: 12px;">开始时间 (秒):</label>
+        <input type="number" id="clip-start" value="0" min="0" style="flex:1;">
+      </div>
+      <div style="display: flex; gap: 10px; align-items: center;">
+        <label style="font-size: 12px;">结束时间 (秒):</label>
+        <input type="number" id="clip-end" value="30" min="1" style="flex:1;">
+      </div>
+
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('trim-add-modal')">取消</button>
+        <button class="btn-confirm" onclick="confirmAddClipToTimeline()">＋ 加入时间线</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="add-category-modal">
+    <div class="modal-box">
+      <h3>创建新类目</h3>
+      <input type="text" id="new-cat-name" placeholder="请输入类目名称">
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('add-category-modal')">取消</button>
+        <button class="btn-confirm" onclick="saveNewCategory()">创建</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-overlay" id="add-video-modal">
+    <div class="modal-box">
+      <h3>添加视频到类目</h3>
+      <input type="text" id="new-video-url" placeholder="粘贴 YouTube 链接或 ID">
+      <input type="text" id="new-video-title" placeholder="标题 (可选)">
+      <div class="modal-btns">
+        <button class="btn-cancel" onclick="closeModal('add-video-modal')">取消</button>
+        <button class="btn-confirm" onclick="saveNewVideo()">添加</button>
+      </div>
+    </div>
+  </div>
+
+  <nav class="bottom-nav">
+    <a href="index.html" class="nav-item">
+      <span>🌙</span>
+      <span>主页</span>
+    </a>
+    <a href="create.html" class="nav-item active">
+      <span>＋</span>
+      <span>创作</span>
+    </a>
+    <a href="my.html" class="nav-item">
+      <span>👤</span>
+      <span>我的</span>
+    </a>
+  </nav>
+
+  <script>
+    // 基础视频类目数据（已全量补充用户指定的四大类目与视频 ID）
+    let categoriesData = {
+      "人声&口腔音": [
+        { id: "a0tl9k3deV0", title: "口腔音 01" },
+        { id: "mfDl72i3k-g", title: "口腔音 02" },
+        { id: "0GBnppu5PR8", title: "舔耳羽毛" },
+        { id: "t4WJHx2-Pvo", title: "柔和低语" }
+      ],
+      "白噪音": [
+        { id: "0aay6rLcEdU", title: "深海雨声" },
+        { id: "yT3ELvaGu0Y", title: "木屋篝火" },
+        { id: "SIV08epFmDQ", title: "海浪拍岸" },
+        { id: "Qhll2RJXJOU", title: "睡眠白噪" },
+        { id: "D-td0OEk0HY", title: "夜雨淅沥" }
+      ],
+      "场景扮演": [
+        { id: "S2OhZsgKT3c", title: "角色扮演 01" },
+        { id: "xdZ3zmM16Nk", title: "助眠采耳" },
+        { id: "IyJOGveGf7Y", title: "睡前检查" },
+        { id: "9Rk07cpLrZs", title: "温柔护理" },
+        { id: "8oksfOGH6Uo", title: "疗愈催眠" }
+      ],
+      "敲击音": [
+        { id: "QkpygCY47ME", title: "木质敲击" },
+        { id: "qe7E6J35E3s", title: "玻璃触感" },
+        { id: "Om9yQb2YuEA", title: "刮刷音效" },
+        { id: "cXogEZUIa1U", title: "海绵敲击" }
+      ]
+    };
+
+    let currentCategory = "人声&口腔音";
+    
+    // 单轨时间线核心数据数组 (Timeline)
+    let timeline = []; 
+    let currentClipIndex = 0;
+    let selectedVideoForTrim = null;
+
+    function initApp() {
+      renderCategories();
+      renderVideos(currentCategory);
+      renderTimeline();
+    }
+
+    // 1. 渲染类目
+    function renderCategories() {
+      const container = document.getElementById('category-container');
+      container.innerHTML = `<div class="chip chip-add" onclick="openModal('add-category-modal')">＋ 新类目</div>`;
+      Object.keys(categoriesData).forEach(cat => {
+        const chip = document.createElement('div');
+        chip.className = `chip ${cat === currentCategory ? 'active' : ''}`;
+        chip.innerText = cat;
+        chip.onclick = () => { currentCategory = cat; renderCategories(); renderVideos(cat); };
+        container.appendChild(chip);
+      });
+    }
+
+    // 2. 渲染待选视频
+    function renderVideos(catName) {
+      const container = document.getElementById('video-list-container');
+      container.innerHTML = `
+        <div class="add-video-btn-card" onclick="openModal('add-video-modal')">
+          <span style="font-size:16px;">＋</span>
+          <span>加视频</span>
+        </div>
+      `;
+      (categoriesData[catName] || []).forEach(v => {
+        const imgUrl = `https://img.youtube.com/vi/${v.id}/hqdefault.jpg`;
+        const card = document.createElement('div');
+        card.className = 'video-card';
+        card.onclick = () => openTrimAddModal(v);
+        card.innerHTML = `
+          <img src="${imgUrl}" alt="cover">
+          <div class="title">${v.title}</div>
+        `;
+        container.appendChild(card);
+      });
+    }
+
+    // 3. 打开截取弹窗
+    function openTrimAddModal(video) {
+      selectedVideoForTrim = video;
+      document.getElementById('trim-modal-title').innerText = `截取片段: ${video.title}`;
+      document.getElementById('clip-start').value = 0;
+      document.getElementById('clip-end').value = 30;
+      openModal('trim-add-modal');
+    }
+
+    // 4. 将截取好的 Clip 追加到单轨时间线中
+    function confirmAddClipToTimeline() {
+      const start = parseInt(document.getElementById('clip-start').value) || 0;
+      const end = parseInt(document.getElementById('clip-end').value) || 30;
+
+      if (start >= end) return alert("开始时间必须小于结束时间！");
+
+      const newClip = {
+        clipId: 'clip_' + Date.now(),
+        id: selectedVideoForTrim.id,
+        title: selectedVideoForTrim.title,
+        start: start,
+        end: end,
+        duration: end - start
+      };
+
+      timeline.push(newClip);
+      renderTimeline();
+      closeModal('trim-add-modal');
+
+      // 自动播放最新添加的片段
+      playClipIndex(timeline.length - 1);
+    }
+
+    // 5. 渲染单轨时间线 UI
+    function renderTimeline() {
+      const container = document.getElementById('timeline-track');
+      if (timeline.length === 0) {
+        container.innerHTML = `<div class="empty-timeline-hint">点击上方视频卡片截取并添加片段</div>`;
+        document.getElementById('timeline-duration').innerText = `总长: 0 秒`;
+        return;
+      }
+
+      container.innerHTML = '';
+      let totalSec = 0;
+
+      timeline.forEach((clip, idx) => {
+        totalSec += clip.duration;
+        const item = document.createElement('div');
+        item.className = `clip-item ${idx === currentClipIndex ? 'active' : ''}`;
+        item.onclick = () => playClipIndex(idx);
+        item.innerHTML = `
+          <div class="clip-title">片段 ${idx + 1}: ${clip.title}</div>
+          <div class="clip-time">✂️ ${clip.start}s - ${clip.end}s (${clip.duration}s)</div>
+          <div class="clip-del-btn" onclick="removeClip(event, ${idx})">✕</div>
+        `;
+        container.appendChild(item);
+      });
+
+      document.getElementById('timeline-duration').innerText = `总长: ${totalSec} 秒 (${timeline.length}个片段)`;
+    }
+
+    // 6. 核心播放逻辑（带 enablejsapi 修复播放问题）
+    function playClipIndex(index) {
+      if (index < 0 || index >= timeline.length) return;
+      currentClipIndex = index;
+      const clip = timeline[index];
+
+      const iframe = document.getElementById('youtube-player');
+      // 添加 enablejsapi=1 & rel=0 保证加载稳定与跨域可播
+      iframe.src = `https://www.youtube.com/embed/${clip.id}?autoplay=1&start=${clip.start}&end=${clip.end}&enablejsapi=1&rel=0`;
+
+      document.getElementById('playing-status').innerText = `🎬 正在播放 [${index + 1}/${timeline.length}]: ${clip.title} (${clip.start}s-${clip.end}s)`;
+      renderTimeline();
+    }
+
+    // 从头顺序播放整个时间线
+    function playTimelineFromStart() {
+      if (timeline.length === 0) return alert("时间线上还没有任何片段！");
+      playClipIndex(0);
+    }
+
+    // 删除时间线上的某个片段
+    function removeClip(e, index) {
+      e.stopPropagation();
+      timeline.splice(index, 1);
+      if (currentClipIndex >= timeline.length) {
+        currentClipIndex = Math.max(0, timeline.length - 1);
+      }
+      renderTimeline();
+      if (timeline.length > 0) {
+        playClipIndex(currentClipIndex);
+      } else {
+        document.getElementById('youtube-player').src = "";
+        document.getElementById('playing-status').innerText = "🎬 未加载片段";
+      }
+    }
+
+    // 7. 🌟 核心修改：保存工程草稿，并精准同步到 my.html 所需的数据格式
+    function saveToMyDrafts() {
+      if (timeline.length === 0) return alert("请先添加至少一个视频片段到时间线！");
+
+      const todayStr = new Date().toISOString().split('T')[0]; // "YYYY-MM-DD"
+      const firstClip = timeline[0];
+      const coverUrl = `https://img.youtube.com/vi/${firstClip.id}/hqdefault.jpg`;
+
+      // 构建对应 my.html 的单日存储对象
+      const projectData = {
+        id: 'proj_' + Date.now(),
+        date: todayStr,
+        title: `ASMR 拼接工程 (${timeline.length}个片段)`,
+        coverUrl: coverUrl,
+        totalDuration: timeline.reduce((acc, cur) => acc + cur.duration, 0),
+        timeline: timeline,
+        savedAt: new Date().getTime()
+      };
+
+      // 1️⃣ 保存到 my.html 读取的特定日期 Key 中 (例如: asmr_project_2026-08-05)
+      localStorage.setItem(`asmr_project_${todayStr}`, JSON.stringify(projectData));
+
+      // 2️⃣ 同时也存一份到通用列表中
+      let drafts = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
+      drafts.unshift(projectData);
+      localStorage.setItem('my_asmr_projects', JSON.stringify(drafts));
+
+      if (confirm("✅ 工程保存成功！是否立即前往“我的”页面查看和播放？")) {
+        window.location.href = "my.html";
+      }
+    }
+
+    // 8. 解析 YouTube ID
+    function extractYoutubeId(val) {
+      if (!val) return null;
+      const match = val.match(/^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/);
+      return (match && match[2].length === 11) ? match[2] : (val.length === 11 ? val : null);
+    }
+
+    // 辅助工具函数
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function saveNewCategory() {
+      const name = document.getElementById('new-cat-name').value.trim();
+      if (!name) return;
+      if (!categoriesData[name]) categoriesData[name] = [];
+      currentCategory = name;
+      renderCategories(); renderVideos(name);
+      closeModal('add-category-modal');
+      document.getElementById('new-cat-name').value = '';
+    }
+
+    function saveNewVideo() {
+      const inputVal = document.getElementById('new-video-url').value.trim();
+      const title = document.getElementById('new-video-title').value.trim() || "自定义视频";
+      const id = extractYoutubeId(inputVal);
+
+      if (!id) return alert("解析失败，请输入有效的 YouTube 链接或 11 位视频 ID！");
+
+      categoriesData[currentCategory].push({ id, title });
+      renderVideos(currentCategory);
+      closeModal('add-video-modal');
+      document.getElementById('new-video-url').value = '';
+      document.getElementById('new-video-title').value = '';
+    }
+
+    function handleUrlPaste(val) {
+      if (val.length >= 11) {
+        const id = extractYoutubeId(val);
+        if (id) {
+          openTrimAddModal({ id, title: "剪贴板视频" });
+        }
+      }
+    }
+
+    window.onload = initApp;
+  </script>
+</body>
+</html>
   <style>
     * {
       margin: 0;
