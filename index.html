@@ -21,6 +21,33 @@
       display: flex;
       justify-content: center;
       overflow: hidden;
+      position: relative;
+    }
+
+    /* 🌟 全屏背景视频样式 */
+    .video-background {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      z-index: 1;
+      overflow: hidden;
+      pointer-events: none; /* 让点击穿透视频，保证按钮可以正常点击 */
+    }
+    .video-background video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(15, 23, 42, 0.45); /* 调暗遮罩，确保文字清晰可见 */
+      backdrop-filter: blur(2px);
     }
 
     /* 容器：垂直分布，让内容天然在屏幕中部居中 */
@@ -88,7 +115,7 @@
       pointer-events: none;
     }
 
-    /* 🌟 纵向单列胶囊按钮布局 (完全贴合原型图) */
+    /* 🌟 纵向单列胶囊按钮布局 */
     .mood-list {
       display: flex;
       flex-direction: column;
@@ -100,7 +127,7 @@
       backdrop-filter: blur(16px);
       -webkit-backdrop-filter: blur(16px);
       border: 1px solid rgba(255, 255, 255, 0.2);
-      border-radius: 25px; /* 长条圆角胶囊 */
+      border-radius: 25px;
       padding: 14px 20px;
       display: flex;
       align-items: center;
@@ -187,7 +214,7 @@
 <body>
 
   <div class="video-background">
-    <video autoplay loop playsinline muted>
+    <video id="bg-video" autoplay loop playsinline>
       <source src="./home.mp4" type="video/mp4">
     </video>
     <div class="overlay"></div>
@@ -247,6 +274,24 @@
   </nav>
 
   <script>
+    // 浏览器安全策略：首次加载时尝试取消静音播放声音
+    window.addEventListener('DOMContentLoaded', () => {
+      const video = document.getElementById('bg-video');
+      video.muted = false;
+      video.play().catch(error => {
+        // 如果浏览器拦截了有声自动播放，监听用户的第一次点击自动恢复声音
+        console.log("浏览器拦截了自动声音播放，等待用户交互解锁...");
+        const unlockAudio = () => {
+          video.muted = false;
+          video.play();
+          document.removeEventListener('click', unlockAudio);
+          document.removeEventListener('touchstart', unlockAudio);
+        };
+        document.addEventListener('click', unlockAudio);
+        document.addEventListener('touchstart', unlockAudio);
+      });
+    });
+
     function handleMoodSelect(type) {
       const optionsBox = document.getElementById('mood-options');
       const responseCard = document.getElementById('response-card');
