@@ -336,9 +336,36 @@
       generateDateMoons();
     }
 
-    function loadProjectForDate(index) {
-      const display = document.getElementById('draft-display');
-      const dateData = availableDates[index];
+   function playSelectedDateProject() {
+
+  const drafts = JSON.parse(
+    localStorage.getItem('my_asmr_projects') || '[]'
+  );
+
+
+  if(drafts.length === 0){
+    alert("暂无保存作品");
+    return;
+  }
+
+
+  const clips = drafts[0].clips;
+
+
+  if(!clips || clips.length === 0){
+    alert("作品里面没有视频片段");
+    return;
+  }
+
+
+  console.log("当前作品：", clips);
+
+
+  alert(
+    `找到 ${clips.length} 个视频片段，可以播放`
+  );
+
+}
       
       // 读取本地工程存储
       const projectData = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
@@ -348,7 +375,7 @@
       // 匹配当前选中日期的工程
       if (projectData.length > 0 && index === 9) {
         // 展示最新的工程封面
-        const firstVideo = projectData[0].timeline[0];
+        const firstVideo = projectData[0].clips[0];
         if (firstVideo) {
           const imgUrl = `https://img.youtube.com/vi/${firstVideo.id}/hqdefault.jpg`;
           display.innerHTML = `<img src="${imgUrl}" alt="project cover">`;
