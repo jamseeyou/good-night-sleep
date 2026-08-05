@@ -23,14 +23,14 @@
       position: relative;
     }
 
-    /* 🌟 修复后的背景视频：确保在最底层，且不会拦截点击 */
+    /* 背景纯画面视频层（静音，100% 自动播放成功） */
     .video-background {
       position: fixed;
       top: 0;
       left: 0;
       width: 100vw;
       height: 100vh;
-      z-index: -1; /* 关键：放到最底层，绝不遮挡文字和按钮 */
+      z-index: -1;
       overflow: hidden;
     }
     .video-background video {
@@ -44,11 +44,11 @@
       left: 0;
       width: 100%;
       height: 100%;
-      background: rgba(15, 23, 42, 0.45); /* 压暗视频背景，让文字清晰 */
+      background: rgba(15, 23, 42, 0.45);
       backdrop-filter: blur(2px);
     }
 
-    /* 容器：垂直分布，让内容在屏幕中部居中 */
+    /* 主体内容容器 */
     .app-container {
       width: 100%;
       max-width: 430px;
@@ -59,7 +59,7 @@
       align-items: center;
       padding: 20px 24px 80px; 
       position: relative;
-      z-index: 10; /* 确保内容在视频上方 */
+      z-index: 10;
     }
 
     /* 头部 Title 区域 */
@@ -100,7 +100,6 @@
       color: #ffffff;
     }
 
-    /* 情绪容器与动画 */
     .mood-container {
       width: 100%;
       transition: all 0.5s ease;
@@ -113,7 +112,6 @@
       pointer-events: none;
     }
 
-    /* 纵向单列胶囊按钮布局 */
     .mood-list {
       display: flex;
       flex-direction: column;
@@ -150,7 +148,6 @@
       letter-spacing: 0.5px;
     }
 
-    /* 情绪响应文案卡片 */
     .response-card {
       display: none;
       opacity: 0;
@@ -212,7 +209,7 @@
 <body>
 
   <div class="video-background">
-    <video id="bg-video" autoplay loop playsinline>
+    <video autoplay loop muted playsinline>
       <source src="./home.mp4" type="video/mp4">
     </video>
     <div class="overlay"></div>
@@ -272,15 +269,18 @@
   </nav>
 
   <script>
-    // 浏览器安全策略：尝试自动播放有声视频，如被拦截则监听首次点击解锁声音
+    // 2. 独立音频控制：利用 JS 创建 Audio 对象加载 home.mp3
+    const bgAudio = new Audio('./home.mp3');
+    bgAudio.loop = true; // 设置循环播放
+    bgAudio.volume = 0.8; // 可以自由调整音量 (0.0 - 1.0)
+
+    // 页面加载后尝试播放音频
     window.addEventListener('DOMContentLoaded', () => {
-      const video = document.getElementById('bg-video');
-      video.muted = false;
-      video.play().catch(error => {
-        console.log("浏览器拦截了有声自动播放，等待用户交互解锁...");
+      bgAudio.play().catch(error => {
+        console.log("浏览器拦截了自动声音，等待用户点击交互后解锁...");
+        // 绑定首次点击或触摸事件来瞬间唤醒声音
         const unlockAudio = () => {
-          video.muted = false;
-          video.play();
+          bgAudio.play();
           document.removeEventListener('click', unlockAudio);
           document.removeEventListener('touchstart', unlockAudio);
         };
