@@ -13,16 +13,39 @@
     }
 
     /* 深夜沉浸渐变背景 */
-    body {
-      width: 100vw;
-      height: 100vh;
-      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%);
-      color: #ffffff;
-      display: flex;
-      justify-content: center;
-      overflow: hidden;
-      position: relative;
-    }
+   <style>
+  /* 全局容器设置 */
+  body {
+    margin: 0;
+    padding: 0;
+    width: 100vw;
+    height: 100vh;
+    
+    /* 🌟 核心背景设置 */
+    background-image: url('planet3.png'); /* 请将文件名替换为您保存此图片的文件名 */
+    background-repeat: no-repeat;
+    background-position: center bottom; /* 确保星球紧贴最底部 */
+    background-size: cover;             /* 确保图片自适应覆盖整个手机屏幕 */
+    background-attachment: fixed;       /* 防止滚动时背景图片移动 */
+    
+    color: #ffffff;
+    display: flex;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  /* 如果你有 .app-container 容器，可以保持背景透明，让 body 的背景透出来 */
+  .app-container {
+    width: 100%;
+    max-width: 430px;
+    height: 100vh;
+    background: transparent; /* 确保透明 */
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    z-index: 10;
+  }
+</style>
 
     /* 移动端主容器 */
     .app-container {
@@ -166,33 +189,8 @@
       justify-content: center;
     }
 
-    /* 🌟🌟 底部星球播放器 (修正白色裂痕与180°翻转) 🌟🌟 */
-    .planet-player-wrapper {
-      position: fixed;
-      bottom: -10px; /* 稍微向下移一点，隐藏底部的黑色边缘 */
-      left: 50%;
-      transform: translateX(-50%);
-      width: 130%; /* 星球稍微超出屏幕边缘，形成天然弧形 */
-      max-width: 500px;
-      height: 160px; /* 控制可见星球的高度 */
-      z-index: 5;
-      display: flex;
-      justify-content: center;
-      overflow: hidden;
-      /* 🌟 使用两层背景混合，确保底部完全透明且贴合 */
-      background: none;
-    }
-
-    .planet-mask-image {
-      width: 100%;
-      height: 100%;
-      background-image: url('planet2.png');
-      background-size: cover;
-      /* 🌟 核心修改 1：将图片顶部对齐容器顶部 */
-      background-position: top center; 
-      /* 🌟 核心修改 2：关键！将图片垂直翻转 180°，形成向上的弧线 */
-      transform: rotate(180deg);
-      
+    
+    
       position: relative;
       display: flex;
       justify-content: center;
