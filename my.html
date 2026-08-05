@@ -389,15 +389,52 @@
     }
 
     function playSelectedDateProject() {
-      const dateData = availableDates[currentDateIndex];
-      const drafts = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
 
-      if (drafts.length > 0 && currentDateIndex === 9) {
-        alert(`🎬 开始顺序播放 ${dateData.monthLabel} 保存的 ASMR 串烧工程...`);
-      } else {
-        alert(`该日期暂无保存的剪辑工程。`);
-      }
-    }
+  const drafts = JSON.parse(
+    localStorage.getItem('my_asmr_projects') || '[]'
+  );
+
+
+  // 没有作品
+  if (drafts.length === 0) {
+
+    alert("该日期暂无保存的剪辑工程。");
+
+    return;
+
+  }
+
+
+  // 获取最新作品
+  const project = drafts[0];
+
+
+  // 获取剪辑片段
+  const clips = project.clips;
+
+
+  if (!clips || clips.length === 0) {
+
+    alert("作品中没有视频片段。");
+
+    return;
+
+  }
+
+
+  // 暂时打印检查数据
+  console.log("准备播放作品：", project);
+
+
+  console.log("视频片段：", clips);
+
+
+  alert(
+    `🎬 找到 ${clips.length} 个 ASMR 片段，准备播放`
+  );
+
+
+}
 
     window.onload = initMyPage;
   </script>
