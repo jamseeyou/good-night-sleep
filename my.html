@@ -12,49 +12,33 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* 深夜沉浸渐变背景 */
-   <style>
-  /* 全局容器设置 */
-  body {
-    margin: 0;
-    padding: 0;
-    width: 100vw;
-    height: 100vh;
-    
-    /* 🌟 核心背景设置 */
-    background-image: url('planet3.jpg'); /* 请将文件名替换为您保存此图片的文件名 */
-    background-repeat: no-repeat;
-    background-position: center bottom; /* 确保星球紧贴最底部 */
-    background-size: cover;             /* 确保图片自适应覆盖整个手机屏幕 */
-    background-attachment: fixed;       /* 防止滚动时背景图片移动 */
-    
-    color: #ffffff;
-    display: flex;
-    justify-content: center;
-    overflow: hidden;
-  }
+    /* 🌟 全局容器：直接使用全屏写实星空与底部月球背景 */
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: 100vh;
+      background-image: url('planet3.jpg'); /* 背景图片 */
+      background-repeat: no-repeat;
+      background-position: center bottom;   /* 确保星球紧贴最底部 */
+      background-size: cover;             /* 自适应覆盖整个手机屏幕 */
+      background-attachment: fixed;
+      color: #ffffff;
+      display: flex;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
 
-  /* 如果你有 .app-container 容器，可以保持背景透明，让 body 的背景透出来 */
-  .app-container {
-    width: 100%;
-    max-width: 430px;
-    height: 100vh;
-    background: transparent; /* 确保透明 */
-    display: flex;
-    flex-direction: column;
-    position: relative;
-    z-index: 10;
-  }
-</style>
-
-    /* 移动端主容器 */
+    /* 移动端主内容容器 (保持背景透明透出 body) */
     .app-container {
       width: 100%;
       max-width: 430px;
       height: 100vh;
+      background: transparent;
       display: flex;
       flex-direction: column;
-      padding: 20px 16px 170px; /* 留出底部星球区域的高度，防止内容重叠 */
+      padding: 20px 16px 120px; /* 底部留出播放按钮与导航栏空间 */
       overflow-y: auto;
       gap: 16px;
       position: relative;
@@ -81,6 +65,7 @@
       font-size: 11px;
       text-decoration: none;
       cursor: pointer;
+      backdrop-filter: blur(8px);
     }
     .title-goodnight {
       font-size: 16px;
@@ -100,7 +85,7 @@
     .draft-display {
       width: 100%;
       height: 200px;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 16px;
       overflow: hidden;
@@ -109,6 +94,7 @@
       justify-content: center;
       align-items: center;
       position: relative;
+      backdrop-filter: blur(10px);
     }
     .draft-display img {
       width: 100%;
@@ -118,8 +104,9 @@
     .empty-display-hint {
       position: absolute;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.5);
       text-align: center;
+      line-height: 1.6;
     }
 
     /* 日期月球滑动栏 */
@@ -130,7 +117,7 @@
     }
     .scroll-hint {
       font-size: 10px;
-      color: rgba(255, 255, 255, 0.5);
+      color: rgba(255, 255, 255, 0.6);
       text-align: center;
     }
     .date-scroll-track {
@@ -146,8 +133,8 @@
     .moon-date {
       width: 52px;
       height: 52px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 50%;
       display: flex;
       flex-direction: column;
@@ -157,10 +144,11 @@
       flex-shrink: 0;
       transition: all 0.3s ease;
       position: relative;
+      backdrop-filter: blur(4px);
     }
     .moon-date.active {
-      background: rgba(99, 102, 241, 0.3);
-      border-color: rgba(255, 255, 255, 0.6);
+      background: rgba(99, 102, 241, 0.4);
+      border-color: rgba(255, 255, 255, 0.8);
       box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
       transform: scale(1.1);
     }
@@ -171,7 +159,7 @@
     }
     .moon-date .date-label {
       font-size: 9px;
-      color: rgba(255, 255, 255, 0.6);
+      color: rgba(255, 255, 255, 0.7);
     }
     .moon-date.active::after {
       content: '✓';
@@ -189,24 +177,23 @@
       justify-content: center;
     }
 
-    
-    
-      position: relative;
+    /* 🌟 悬浮在底部月球上的播放按钮包裹区 */
+    .planet-player-wrapper {
+      position: fixed;
+      bottom: 85px; /* 悬浮在导航栏上方，靠拢背景月球顶部弧度 */
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 20;
       display: flex;
       justify-content: center;
-      /* 由于图片翻转了，padding 需要加到底部，才能让内容在视觉上靠在星球上 */
-      padding-bottom: 30px; 
-      align-items: flex-end; /* 让按钮在底部排列 */
     }
 
-    /* 播放按钮 */
+    /* 播放按钮样式 */
     .play-btn-capsule {
-      /* 由于父元素旋转了，按钮需要再次反向旋转 180° 才能正常显示文字 */
-      transform: rotate(180deg); 
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.3);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border-radius: 20px;
       padding: 10px 24px;
       color: white;
@@ -214,15 +201,16 @@
       font-weight: 500;
       letter-spacing: 1px;
       cursor: pointer;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
-      transition: background 0.3s ease;
-      height: 38px;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      height: 40px;
     }
     .play-btn-capsule:active {
-      background: rgba(255, 255, 255, 0.25);
+      background: rgba(255, 255, 255, 0.35);
+      transform: scale(0.98);
     }
 
-    /* 底部导航栏 */
+    /* 底部固定导航栏 */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -233,6 +221,7 @@
       height: 65px;
       background: rgba(15, 23, 42, 0.85);
       backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.12);
       display: flex;
       justify-content: space-around;
@@ -279,9 +268,7 @@
   </div>
 
   <div class="planet-player-wrapper">
-    <div class="planet-mask-image">
-      <button class="play-btn-capsule" onclick="playSelectedDateProject()">播放该日ASMR工程</button>
-    </div>
+    <button class="play-btn-capsule" onclick="playSelectedDateProject()">播放该日ASMR工程</button>
   </div>
 
   <nav class="bottom-nav">
@@ -328,7 +315,7 @@
     // 生成日期月球并设置选中状态
     function generateDateMoons() {
       const track = document.getElementById('date-scroll-track');
-      track.innerHTML = ''; // 清空
+      track.innerHTML = ''; 
       
       const today = new Date();
       availableDates = [];
@@ -341,7 +328,7 @@
           dateObj: d,
           dayNum: d.getDate(),
           monthLabel: (d.getMonth() + 1) + '/' + d.getDate(),
-          storageKey: `asmr_project_${d.toISOString().split('T')[0]}` // 对应日期在 localStorage 的键
+          storageKey: `asmr_project_${d.toISOString().split('T')[0]}`
         });
       }
 
@@ -364,7 +351,7 @@
     // 选中日期时的交互
     function selectDateIndex(index) {
       currentDateIndex = index;
-      generateDateMoons(); // 重新渲染状态
+      generateDateMoons(); 
     }
 
     // 读取并加载指定日期的视频工程封面图
@@ -372,14 +359,11 @@
       const display = document.getElementById('draft-display');
       const dateData = availableDates[index];
       
-      // 读取本地工程数据 (在create.html中保存)
       const projectData = localStorage.getItem(dateData.storageKey);
 
       if (projectData) {
-        // 如果有数据，加载封面图 (这里后续可以提取YouTube封面)
         display.innerHTML = '<img src="path/to/project_cover.jpg" alt=" project cover">';
       } else {
-        // 无数据展示提示
         display.innerHTML = `<div class="empty-display-hint">
           ${dateData.monthLabel}该日期暂无剪辑工程。<br>去“创作”页面剪辑并保存一个吧！
         </div>`;
@@ -393,7 +377,6 @@
 
       if (projectData) {
         alert(`🎬 开始顺序播放 ${dateData.monthLabel} 的助眠工程...`);
-        // 这里可以跳转到播放页面或启动播放器
       } else {
         alert(`该日期暂无保存的工程，请点击上方去创作。`);
       }
