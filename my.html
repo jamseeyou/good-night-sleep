@@ -12,7 +12,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* 🌟 全局容器：直接使用全屏写实星空与底部月球背景 */
+    /* 🌟 全局容器：全屏写实星空与底部月球背景 */
     body {
       margin: 0;
       padding: 0;
@@ -21,16 +21,17 @@
       background-image: url('planet3.jpg'); /* 背景图片 */
       background-repeat: no-repeat;
       background-position: center bottom;   /* 确保星球紧贴最底部 */
-      background-size: cover;             /* 自适应覆盖整个手机屏幕 */
+      background-size: cover;              /* 自适应覆盖整个手机屏幕 */
       background-attachment: fixed;
       color: #ffffff;
       display: flex;
       justify-content: center;
+      align-items: center;                  /* 垂直居中整个 App 内容 */
       overflow: hidden;
       position: relative;
     }
 
-    /* 移动端主内容容器 (保持背景透明透出 body) */
+    /* 移动端主内容容器 (利用 Flex 垂直居中内容组件) */
     .app-container {
       width: 100%;
       max-width: 430px;
@@ -38,63 +39,83 @@
       background: transparent;
       display: flex;
       flex-direction: column;
-      padding: 20px 16px 120px; /* 底部留出播放按钮与导航栏空间 */
-      overflow-y: auto;
-      gap: 16px;
+      justify-content: center;              /* 核心修改：让播放器等主体垂直居于屏幕中部 */
+      padding: 20px 16px 100px;             /* 底部留出悬浮播放按钮与导航栏空间 */
+      gap: 20px;
       position: relative;
       z-index: 10;
+      box-sizing: border-box;
     }
 
     /* 顶部导航与鼓励 */
     .header-my {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      width: 100%;
+      margin-bottom: 5px;
     }
+
+    /* 三段式 Grid 布局，完美保证 GOOD NIGHT 绝对居中 */
     .top-bar-my {
-      display: flex;
-      justify-content: space-between;
+      display: grid;
+      grid-template-columns: 80px 1fr 80px;  /* 左右各留 80px 宽度的对齐空间 */
       align-items: center;
+      width: 100%;
     }
+
     .back-to-create {
-      background: rgba(255, 255, 255, 0.1);
-      border: 1px solid rgba(255, 255, 255, 0.2);
+      justify-self: start;
+      background: rgba(255, 255, 255, 0.12);
+      border: 1px solid rgba(255, 255, 255, 0.25);
       border-radius: 12px;
-      padding: 6px 12px;
-      color: rgba(255, 255, 255, 0.8);
+      padding: 6px 10px;
+      color: rgba(255, 255, 255, 0.9);
       font-size: 11px;
       text-decoration: none;
       cursor: pointer;
       backdrop-filter: blur(8px);
-    }
-    .title-goodnight {
-      font-size: 16px;
-      font-weight: bold;
-      text-align: center;
-      flex: 1;
-    }
-    .random-quote {
-      font-size: 11px;
-      color: rgba(255, 255, 255, 0.7);
-      text-align: center;
-      margin-top: 4px;
-      font-style: italic;
+      white-space: nowrap;
     }
 
-    /* 主视频预览区 */
+    /* 1. GOOD NIGHT 文本精准居中 */
+    .title-goodnight {
+      font-size: 18px;
+      font-weight: 800;
+      text-align: center;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #ffffff;
+      text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 2. 随机一句话：字号加大、居中 */
+    .random-quote {
+      font-size: 15px;                      /* 字号加大 */
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.9);
+      text-align: center;
+      line-height: 1.4;
+      text-shadow: 0 2px 6px rgba(0, 0, 0, 0.6);
+      padding: 0 10px;
+    }
+
+    /* 3. 主视频预览区（居于屏幕中心区域） */
     .draft-display {
       width: 100%;
-      height: 200px;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
+      height: 210px;                         /* 适当调大主卡片比例 */
+      background: rgba(15, 23, 42, 0.45);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      border-radius: 20px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.5);
       display: flex;
       justify-content: center;
       align-items: center;
       position: relative;
-      backdrop-filter: blur(10px);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      flex-shrink: 0;
     }
     .draft-display img {
       width: 100%;
@@ -103,36 +124,38 @@
     }
     .empty-display-hint {
       position: absolute;
-      font-size: 12px;
-      color: rgba(255, 255, 255, 0.5);
+      font-size: 13px;
+      color: rgba(255, 255, 255, 0.7);
       text-align: center;
       line-height: 1.6;
+      padding: 0 20px;
     }
 
     /* 日期月球滑动栏 */
     .date-scroll-section {
       display: flex;
       flex-direction: column;
-      gap: 8px;
+      gap: 10px;
+      width: 100%;
     }
     .scroll-hint {
-      font-size: 10px;
-      color: rgba(255, 255, 255, 0.6);
+      font-size: 11px;
+      color: rgba(255, 255, 255, 0.65);
       text-align: center;
     }
     .date-scroll-track {
       display: flex;
       gap: 12px;
       overflow-x: auto;
-      padding: 8px 2px;
+      padding: 8px 4px;
       scrollbar-width: none;
       align-items: center;
     }
     .date-scroll-track::-webkit-scrollbar { display: none; }
 
     .moon-date {
-      width: 52px;
-      height: 52px;
+      width: 54px;
+      height: 54px;
       background: rgba(255, 255, 255, 0.08);
       border: 1px solid rgba(255, 255, 255, 0.15);
       border-radius: 50%;
@@ -147,25 +170,25 @@
       backdrop-filter: blur(4px);
     }
     .moon-date.active {
-      background: rgba(99, 102, 241, 0.4);
-      border-color: rgba(255, 255, 255, 0.8);
-      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
-      transform: scale(1.1);
+      background: rgba(99, 102, 241, 0.45);
+      border-color: rgba(255, 255, 255, 0.9);
+      box-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
+      transform: scale(1.08);
     }
     .moon-date .date-num {
-      font-size: 13px;
+      font-size: 14px;
       font-weight: bold;
       color: #ffffff;
     }
     .moon-date .date-label {
       font-size: 9px;
-      color: rgba(255, 255, 255, 0.7);
+      color: rgba(255, 255, 255, 0.75);
     }
     .moon-date.active::after {
       content: '✓';
       position: absolute;
-      top: -4px;
-      right: -4px;
+      top: -3px;
+      right: -3px;
       background: #4ade80;
       color: white;
       font-size: 10px;
@@ -175,39 +198,45 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      font-weight: bold;
     }
 
     /* 🌟 悬浮在底部月球上的播放按钮包裹区 */
     .planet-player-wrapper {
       position: fixed;
-      bottom: 85px; /* 悬浮在导航栏上方，靠拢背景月球顶部弧度 */
+      bottom: 80px;                         /* 位于底部导航栏上方 */
       left: 50%;
       transform: translateX(-50%);
       z-index: 20;
       display: flex;
       justify-content: center;
+      width: 100%;
+      max-width: 430px;
     }
 
     /* 播放按钮样式 */
     .play-btn-capsule {
-      background: rgba(255, 255, 255, 0.2);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-radius: 20px;
-      padding: 10px 24px;
+      background: rgba(255, 255, 255, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.4);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-radius: 24px;
+      padding: 10px 28px;
       color: white;
       font-size: 13px;
-      font-weight: 500;
+      font-weight: 600;
       letter-spacing: 1px;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s ease;
-      height: 40px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+      transition: all 0.2s ease;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
     .play-btn-capsule:active {
-      background: rgba(255, 255, 255, 0.35);
-      transform: scale(0.98);
+      background: rgba(255, 255, 255, 0.4);
+      transform: scale(0.96);
     }
 
     /* 底部固定导航栏 */
@@ -219,7 +248,7 @@
       width: 100%;
       max-width: 430px;
       height: 65px;
-      background: rgba(15, 23, 42, 0.85);
+      background: rgba(15, 23, 42, 0.88);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-top: 1px solid rgba(255, 255, 255, 0.12);
@@ -251,7 +280,7 @@
       <div class="top-bar-my">
         <a href="create.html" class="back-to-create">← 去创作</a>
         <div class="title-goodnight">Good Night</div>
-      </div>
+        <div></div> </div>
       <p class="random-quote" id="random-quote">你很安全，你被爱着，现在可以安心休息</p>
     </header>
 
@@ -262,7 +291,7 @@
     <div class="date-scroll-section">
       <p class="scroll-hint">左右滑动月球解锁对应日期的视频工程 (保留近10天)</p>
       <div class="date-scroll-track" id="date-scroll-track">
-        </div>
+      </div>
     </div>
 
   </div>
@@ -362,7 +391,7 @@
       const projectData = localStorage.getItem(dateData.storageKey);
 
       if (projectData) {
-        display.innerHTML = '<img src="path/to/project_cover.jpg" alt=" project cover">';
+        display.innerHTML = '<img src="path/to/project_cover.jpg" alt="project cover">';
       } else {
         display.innerHTML = `<div class="empty-display-hint">
           ${dateData.monthLabel}该日期暂无剪辑工程。<br>去“创作”页面剪辑并保存一个吧！
