@@ -12,147 +12,98 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* 1. 统一背景（与 create 页面一致） */
+    /* 深夜沉浸渐变背景 */
     body {
       width: 100vw;
       height: 100vh;
-      background: radial-gradient(circle at 50% -20%, #2e1065 0%, #0f172a 65%);
+      background: radial-gradient(circle at 50% 0%, #1e1b4b 0%, #0f172a 70%);
       color: #ffffff;
       display: flex;
       justify-content: center;
       overflow: hidden;
+      position: relative;
     }
 
+    /* 移动端主容器 */
     .app-container {
       width: 100%;
       max-width: 430px;
       height: 100vh;
       display: flex;
       flex-direction: column;
-      padding: 16px 16px 80px; /* 留出底部导航空间 */
+      padding: 20px 16px 170px; /* 留出底部星球区域的高度，防止内容重叠 */
       overflow-y: auto;
-      gap: 12px;
+      gap: 16px;
       position: relative;
+      z-index: 10;
     }
 
-    /* 2. 顶部 Header - 修复问题3：使 GOOD NIGHT 绝对居中 */
+    /* 顶部导航与鼓励 */
     .header-my {
       display: flex;
       flex-direction: column;
       gap: 8px;
-      margin-top: 10px;
-      position: relative;
     }
     .top-bar-my {
       display: flex;
-      align-items: center;
       justify-content: space-between;
-      position: relative;
-      height: 32px;
+      align-items: center;
     }
     .back-to-create {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.1);
       border: 1px solid rgba(255, 255, 255, 0.2);
       border-radius: 12px;
       padding: 6px 12px;
-      color: rgba(255, 255, 255, 0.85);
+      color: rgba(255, 255, 255, 0.8);
       font-size: 11px;
       text-decoration: none;
       cursor: pointer;
-      backdrop-filter: blur(10px);
-      z-index: 2;
     }
     .title-goodnight {
-      font-size: 17px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      white-space: nowrap;
-      z-index: 1;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      flex: 1;
     }
     .random-quote {
       font-size: 11px;
-      color: rgba(255, 255, 255, 0.75);
+      color: rgba(255, 255, 255, 0.7);
       text-align: center;
       margin-top: 4px;
-      line-height: 1.4;
+      font-style: italic;
     }
 
-    /* 3. 视频主要展示区 - 修复问题1与问题2：完美契合图片与支持Iframe播放 */
+    /* 主视频预览区 */
     .draft-display {
       width: 100%;
-      height: 220px;
+      height: 200px;
       background: rgba(0, 0, 0, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.18);
-      border-radius: 18px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 16px;
       overflow: hidden;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
       display: flex;
-      flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
-      backdrop-filter: blur(10px);
     }
     .draft-display img {
       width: 100%;
       height: 100%;
       object-fit: cover;
-      display: block;
-    }
-    .draft-display iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
     }
     .empty-display-hint {
       position: absolute;
       font-size: 12px;
-      color: rgba(255, 255, 255, 0.45);
+      color: rgba(255, 255, 255, 0.4);
       text-align: center;
-      padding: 20px;
-      line-height: 1.6;
     }
 
-    /* 包含多个片段时的快速播放条 */
-    .clip-selector-bar {
-      position: absolute;
-      bottom: 8px;
-      left: 8px;
-      right: 8px;
-      display: flex;
-      gap: 6px;
-      overflow-x: auto;
-      padding: 4px;
-      background: rgba(15, 23, 42, 0.75);
-      backdrop-filter: blur(8px);
-      border-radius: 10px;
-      z-index: 5;
-    }
-    .clip-selector-bar::-webkit-scrollbar { display: none; }
-    .clip-thumb-btn {
-      padding: 4px 8px;
-      font-size: 10px;
-      background: rgba(255, 255, 255, 0.15);
-      border: 1px solid rgba(255, 255, 255, 0.2);
-      color: white;
-      border-radius: 6px;
-      cursor: pointer;
-      white-space: nowrap;
-    }
-    .clip-thumb-btn.active {
-      background: #6366f1;
-      border-color: #a5b4fc;
-    }
-
-    /* 4. 近10天月球滑动轨道 */
+    /* 日期月球滑动栏 */
     .date-scroll-section {
       display: flex;
       flex-direction: column;
-      gap: 6px;
-      margin-top: 8px;
+      gap: 8px;
     }
     .scroll-hint {
       font-size: 10px;
@@ -163,17 +114,17 @@
       display: flex;
       gap: 12px;
       overflow-x: auto;
+      padding: 8px 2px;
       scrollbar-width: none;
-      padding: 10px 4px;
       align-items: center;
     }
     .date-scroll-track::-webkit-scrollbar { display: none; }
 
     .moon-date {
-      width: 48px;
-      height: 48px;
-      background: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.15);
+      width: 52px;
+      height: 52px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 50%;
       display: flex;
       flex-direction: column;
@@ -185,10 +136,10 @@
       position: relative;
     }
     .moon-date.active {
-      background: rgba(99, 102, 241, 0.4);
-      border-color: rgba(165, 180, 252, 0.8);
-      box-shadow: 0 0 15px rgba(99, 102, 241, 0.5);
-      transform: scale(1.12);
+      background: rgba(99, 102, 241, 0.3);
+      border-color: rgba(255, 255, 255, 0.6);
+      box-shadow: 0 0 15px rgba(255, 255, 255, 0.3);
+      transform: scale(1.1);
     }
     .moon-date .date-num {
       font-size: 13px;
@@ -197,7 +148,7 @@
     }
     .moon-date .date-label {
       font-size: 9px;
-      color: rgba(255, 255, 255, 0.65);
+      color: rgba(255, 255, 255, 0.6);
     }
     .moon-date.active::after {
       content: '✓';
@@ -205,56 +156,75 @@
       top: -4px;
       right: -4px;
       background: #4ade80;
-      color: #0f172a;
-      font-size: 9px;
-      width: 15px;
-      height: 15px;
+      color: white;
+      font-size: 10px;
+      width: 16px;
+      height: 16px;
       border-radius: 50%;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-weight: bold;
     }
 
-    /* 5. 底部星球播放器 */
-    .planet-player-section {
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      margin-top: auto;
-      position: relative;
-    }
-    .planet-surface {
-      width: 130%;
+    /* 🌟🌟 底部星球播放器 (修正白色裂痕与180°翻转) 🌟🌟 */
+    .planet-player-wrapper {
+      position: fixed;
+      bottom: -10px; /* 稍微向下移一点，隐藏底部的黑色边缘 */
+      left: 50%;
+      transform: translateX(-50%);
+      width: 130%; /* 星球稍微超出屏幕边缘，形成天然弧形 */
       max-width: 500px;
-      height: 150px;
-      background-image: url('planet.png');
-      background-size: cover;
-      background-position: top center;
-      border-radius: 50% 50% 0 0;
-      box-shadow: 0 -10px 40px rgba(99, 102, 241, 0.35);
-      position: relative;
-      cursor: pointer;
+      height: 160px; /* 控制可见星球的高度 */
+      z-index: 5;
       display: flex;
       justify-content: center;
-      padding-top: 26px;
+      overflow: hidden;
+      /* 🌟 使用两层背景混合，确保底部完全透明且贴合 */
+      background: none;
     }
+
+    .planet-mask-image {
+      width: 100%;
+      height: 100%;
+      background-image: url('planet-mask.png');
+      background-size: cover;
+      /* 🌟 核心修改 1：将图片顶部对齐容器顶部 */
+      background-position: top center; 
+      /* 🌟 核心修改 2：关键！将图片垂直翻转 180°，形成向上的弧线 */
+      transform: rotate(180deg);
+      
+      position: relative;
+      display: flex;
+      justify-content: center;
+      /* 由于图片翻转了，padding 需要加到底部，才能让内容在视觉上靠在星球上 */
+      padding-bottom: 30px; 
+      align-items: flex-end; /* 让按钮在底部排列 */
+    }
+
+    /* 播放按钮 */
     .play-btn-capsule {
-      background: rgba(255, 255, 255, 0.18);
-      border: 1px solid rgba(255, 255, 255, 0.35);
-      backdrop-filter: blur(12px);
+      /* 由于父元素旋转了，按钮需要再次反向旋转 180° 才能正常显示文字 */
+      transform: rotate(180deg); 
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       border-radius: 20px;
-      padding: 8px 24px;
+      padding: 10px 24px;
       color: white;
       font-size: 13px;
       font-weight: 500;
       letter-spacing: 1px;
-      height: 38px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
       cursor: pointer;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+      transition: background 0.3s ease;
+      height: 38px;
+    }
+    .play-btn-capsule:active {
+      background: rgba(255, 255, 255, 0.25);
     }
 
-    /* 6. 底部导航 */
+    /* 底部导航栏 */
     .bottom-nav {
       position: fixed;
       bottom: 0;
@@ -293,37 +263,46 @@
     <header class="header-my">
       <div class="top-bar-my">
         <a href="create.html" class="back-to-create">← 去创作</a>
-        <div class="title-goodnight">GOOD NIGHT</div>
+        <div class="title-goodnight">Good Night</div>
       </div>
-      <p class="random-quote" id="random-quote">加载中...</p>
+      <p class="random-quote" id="random-quote">你很安全，你被爱着，现在可以安心休息</p>
     </header>
 
     <div class="draft-display" id="draft-display">
-      <div class="empty-display-hint">该日期暂无剪辑工程。<br>左右滑动下方月球可切换日期。</div>
+      <div class="empty-display-hint">该日期暂无剪辑工程。<br>左右滑动下方月球切换日期。</div>
     </div>
 
     <div class="date-scroll-section">
       <p class="scroll-hint">左右滑动月球解锁对应日期的视频工程 (保留近10天)</p>
       <div class="date-scroll-track" id="date-scroll-track">
-      </div>
-    </div>
-
-    <div class="planet-player-section">
-      <div class="planet-surface" onclick="playSelectedDateProject()">
-        <button class="play-btn-capsule">▶ 播放该日ASMR工程</button>
-      </div>
+        </div>
     </div>
 
   </div>
 
+  <div class="planet-player-wrapper">
+    <div class="planet-mask-image">
+      <button class="play-btn-capsule" onclick="playSelectedDateProject()">播放该日ASMR工程</button>
+    </div>
+  </div>
+
   <nav class="bottom-nav">
-    <a href="index.html" class="nav-item"><span>🌙</span><span>主页</span></a>
-    <a href="create.html" class="nav-item"><span>＋</span><span>创作</span></a>
-    <a href="my.html" class="nav-item active"><span>👤</span><span>我的</span></a>
+    <a href="index.html" class="nav-item">
+      <span>🌙</span>
+      <span>主页</span>
+    </a>
+    <a href="create.html" class="nav-item">
+      <span>＋</span>
+      <span>创作</span>
+    </a>
+    <a href="my.html" class="nav-item active">
+      <span>👤</span>
+      <span>我的</span>
+    </a>
   </nav>
 
   <script>
-    // 鼓励语录库
+    // 鼓励句子库
     const quotes = [
       "好好休息，明天会是新的开始",
       "今天的你已经很努力了，现在该休息了",
@@ -335,25 +314,28 @@
       "让思绪慢下来，让心安静下来"
     ];
 
-    let currentDateIndex = 9; // 默认选中今天（第10个月球）
+    let currentDateIndex = 9; // 默认选中最后一天（今天）
     let availableDates = [];
-    let currentClips = []; // 保存当前选中日期的播放片段
 
+    // 初始化
     function initMyPage() {
-      // 1. 设置随机鼓励语
-      document.getElementById('random-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
-      // 2. 生成日期月球列表
+      // 1. 设置随机句子
+      const quoteEl = document.getElementById('random-quote');
+      quoteEl.innerText = quotes[Math.floor(Math.random() * quotes.length)];
+
+      // 2. 生成近 10 天日期数据
       generateDateMoons();
     }
 
-    // 生成近10天的月球选项
+    // 生成日期月球并设置选中状态
     function generateDateMoons() {
       const track = document.getElementById('date-scroll-track');
-      track.innerHTML = '';
+      track.innerHTML = ''; // 清空
       
       const today = new Date();
       availableDates = [];
 
+      // 生成近 10 天日期
       for (let i = 9; i >= 0; i--) {
         const d = new Date(today);
         d.setDate(today.getDate() - i);
@@ -361,10 +343,11 @@
           dateObj: d,
           dayNum: d.getDate(),
           monthLabel: (d.getMonth() + 1) + '/' + d.getDate(),
-          dateKey: d.toISOString().split('T')[0]
+          storageKey: `asmr_project_${d.toISOString().split('T')[0]}` // 对应日期在 localStorage 的键
         });
       }
 
+      // 渲染
       availableDates.forEach((date, idx) => {
         const moon = document.createElement('div');
         moon.className = `moon-date ${idx === currentDateIndex ? 'active' : ''}`;
@@ -376,102 +359,46 @@
         track.appendChild(moon);
       });
 
+      // 加载选定日期的工程数据
       loadProjectForDate(currentDateIndex);
     }
 
+    // 选中日期时的交互
     function selectDateIndex(index) {
       currentDateIndex = index;
-      generateDateMoons();
+      generateDateMoons(); // 重新渲染状态
     }
 
-    // 加载指定日期的作品工程
+    // 读取并加载指定日期的视频工程封面图
     function loadProjectForDate(index) {
       const display = document.getElementById('draft-display');
       const dateData = availableDates[index];
       
-      // 从本地存储读取所有保存的作品
-      const drafts = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
-      
-      display.innerHTML = '';
-      currentClips = [];
+      // 读取本地工程数据 (在create.html中保存)
+      const projectData = localStorage.getItem(dateData.storageKey);
 
-      // 本地存储有数据且处于选中状态时展示
-      if (drafts.length > 0 && index === 9) {
-        const project = drafts[0];
-        if (project && project.clips && project.clips.length > 0) {
-          currentClips = project.clips;
-          showVideoPreview(0); // 默认预览第一个片段
-          return;
-        }
+      if (projectData) {
+        // 如果有数据，加载封面图 (这里后续可以提取YouTube封面)
+        display.innerHTML = '<img src="path/to/project_cover.jpg" alt=" project cover">';
+      } else {
+        // 无数据展示提示
+        display.innerHTML = `<div class="empty-display-hint">
+          ${dateData.monthLabel}该日期暂无剪辑工程。<br>去“创作”页面剪辑并保存一个吧！
+        </div>`;
       }
-
-      // 无作品时的占位文案
-      display.innerHTML = `<div class="empty-display-hint">
-        ${dateData.monthLabel} 暂无保存的工程。<br>去“创作”页面剪辑并保存一个吧！
-      </div>`;
     }
 
-    // 展示静态图片预览与片段选择按钮
-    function showVideoPreview(clipIndex) {
-      const display = document.getElementById('draft-display');
-      const clip = currentClips[clipIndex];
-      if (!clip) return;
-
-      const imgUrl = `https://img.youtube.com/vi/${clip.id}/hqdefault.jpg`;
-      
-      let selectorHtml = '';
-      if (currentClips.length > 1) {
-        selectorHtml = `<div class="clip-selector-bar">`;
-        currentClips.forEach((c, idx) => {
-          selectorHtml += `<button class="clip-thumb-btn ${idx === clipIndex ? 'active' : ''}" onclick="event.stopPropagation(); showVideoPreview(${idx})">片段 ${idx + 1}</button>`;
-        });
-        selectorHtml += `</div>`;
-      }
-
-      display.innerHTML = `
-        <img src="${imgUrl}" alt="project cover">
-        ${selectorHtml}
-      `;
-    }
-
-    // 修复问题1：真正的播放逻辑，把封面图替换为可播放的 YouTube iframe
+    // 播放指定日期的工程
     function playSelectedDateProject() {
       const dateData = availableDates[currentDateIndex];
-      const display = document.getElementById('draft-display');
+      const projectData = localStorage.getItem(dateData.storageKey);
 
-      if (!currentClips || currentClips.length === 0) {
-        alert(`${dateData.monthLabel} 暂无保存的剪辑工程。`);
-        return;
+      if (projectData) {
+        alert(`🎬 开始顺序播放 ${dateData.monthLabel} 的助眠工程...`);
+        // 这里可以跳转到播放页面或启动播放器
+      } else {
+        alert(`该日期暂无保存的工程，请点击上方去创作。`);
       }
-
-      // 默认播放第 1 个片段
-      playClip(0);
-    }
-
-    // 在展示框内加载 YouTube 视频播放
-    function playClip(clipIndex) {
-      const display = document.getElementById('draft-display');
-      const clip = currentClips[clipIndex];
-      if (!clip) return;
-
-      // 如果有时间范围剪辑参数，拼接 start/end
-      let iframeSrc = `https://www.youtube.com/embed/${clip.id}?autoplay=1`;
-      if (clip.start) iframeSrc += `&start=${Math.floor(clip.start)}`;
-      if (clip.end) iframeSrc += `&end=${Math.floor(clip.end)}`;
-
-      let selectorHtml = '';
-      if (currentClips.length > 1) {
-        selectorHtml = `<div class="clip-selector-bar">`;
-        currentClips.forEach((c, idx) => {
-          selectorHtml += `<button class="clip-thumb-btn ${idx === clipIndex ? 'active' : ''}" onclick="playClip(${idx})">▶ 片段 ${idx + 1}</button>`;
-        });
-        selectorHtml += `</div>`;
-      }
-
-      display.innerHTML = `
-        <iframe src="${iframeSrc}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-        ${selectorHtml}
-      `;
     }
 
     window.onload = initMyPage;
