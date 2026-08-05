@@ -12,7 +12,7 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
 
-    /* 1. 统一采用与 create 页面一致的深夜极光弥散渐变背景 */
+    /* 1. 统一背景（与 create 页面一致） */
     body {
       width: 100vw;
       height: 100vh;
@@ -35,17 +35,20 @@
       position: relative;
     }
 
-    /* 2. 顶部 Header (参考原型图 P1) */
+    /* 2. 顶部 Header - 修复问题3：使 GOOD NIGHT 绝对居中 */
     .header-my {
       display: flex;
       flex-direction: column;
       gap: 8px;
       margin-top: 10px;
+      position: relative;
     }
     .top-bar-my {
       display: flex;
-      justify-content: space-between;
       align-items: center;
+      justify-content: space-between;
+      position: relative;
+      height: 32px;
     }
     .back-to-create {
       background: rgba(255, 255, 255, 0.08);
@@ -57,13 +60,17 @@
       text-decoration: none;
       cursor: pointer;
       backdrop-filter: blur(10px);
+      z-index: 2;
     }
     .title-goodnight {
       font-size: 17px;
       font-weight: 600;
-      text-align: center;
-      flex: 1;
       letter-spacing: 1px;
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      white-space: nowrap;
+      z-index: 1;
     }
     .random-quote {
       font-size: 11px;
@@ -73,16 +80,17 @@
       line-height: 1.4;
     }
 
-    /* 3. 视频主要展示区 (原型图 P1) */
+    /* 3. 视频主要展示区 - 修复问题1与问题2：完美契合图片与支持Iframe播放 */
     .draft-display {
       width: 100%;
-      height: 200px;
-      background: rgba(0, 0, 0, 0.4);
+      height: 220px;
+      background: rgba(0, 0, 0, 0.5);
       border: 1px solid rgba(255, 255, 255, 0.18);
       border-radius: 18px;
       overflow: hidden;
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 20px rgba(99, 102, 241, 0.15);
       display: flex;
+      flex-direction: column;
       justify-content: center;
       align-items: center;
       position: relative;
@@ -92,6 +100,12 @@
       width: 100%;
       height: 100%;
       object-fit: cover;
+      display: block;
+    }
+    .draft-display iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
     }
     .empty-display-hint {
       position: absolute;
@@ -100,6 +114,37 @@
       text-align: center;
       padding: 20px;
       line-height: 1.6;
+    }
+
+    /* 包含多个片段时的快速播放条 */
+    .clip-selector-bar {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      padding: 4px;
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(8px);
+      border-radius: 10px;
+      z-index: 5;
+    }
+    .clip-selector-bar::-webkit-scrollbar { display: none; }
+    .clip-thumb-btn {
+      padding: 4px 8px;
+      font-size: 10px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: white;
+      border-radius: 6px;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+    .clip-thumb-btn.active {
+      background: #6366f1;
+      border-color: #a5b4fc;
     }
 
     /* 4. 近10天月球滑动轨道 */
@@ -171,7 +216,7 @@
       font-weight: bold;
     }
 
-    /* 5. 底部写实风紫色星球播放器 */
+    /* 5. 底部星球播放器 */
     .planet-player-section {
       width: 100%;
       display: flex;
@@ -183,7 +228,7 @@
       width: 130%;
       max-width: 500px;
       height: 150px;
-      background-image: url('planet.png'); /* 保留生成的写实月球图片 */
+      background-image: url('planet.png');
       background-size: cover;
       background-position: top center;
       border-radius: 50% 50% 0 0;
@@ -206,6 +251,7 @@
       letter-spacing: 1px;
       height: 38px;
       box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      cursor: pointer;
     }
 
     /* 6. 底部导航 */
@@ -247,7 +293,7 @@
     <header class="header-my">
       <div class="top-bar-my">
         <a href="create.html" class="back-to-create">← 去创作</a>
-        <div class="title-goodnight">Good Night</div>
+        <div class="title-goodnight">GOOD NIGHT</div>
       </div>
       <p class="random-quote" id="random-quote">加载中...</p>
     </header>
@@ -259,12 +305,12 @@
     <div class="date-scroll-section">
       <p class="scroll-hint">左右滑动月球解锁对应日期的视频工程 (保留近10天)</p>
       <div class="date-scroll-track" id="date-scroll-track">
-        </div>
+      </div>
     </div>
 
     <div class="planet-player-section">
       <div class="planet-surface" onclick="playSelectedDateProject()">
-        <button class="play-btn-capsule">播放该日ASMR</button>
+        <button class="play-btn-capsule">▶ 播放该日ASMR工程</button>
       </div>
     </div>
 
@@ -291,14 +337,16 @@
 
     let currentDateIndex = 9; // 默认选中今天（第10个月球）
     let availableDates = [];
+    let currentClips = []; // 保存当前选中日期的播放片段
 
     function initMyPage() {
-      // 随机句子
+      // 1. 设置随机鼓励语
       document.getElementById('random-quote').innerText = quotes[Math.floor(Math.random() * quotes.length)];
-      // 生成日期月球
+      // 2. 生成日期月球列表
       generateDateMoons();
     }
 
+    // 生成近10天的月球选项
     function generateDateMoons() {
       const track = document.getElementById('date-scroll-track');
       track.innerHTML = '';
@@ -313,7 +361,7 @@
           dateObj: d,
           dayNum: d.getDate(),
           monthLabel: (d.getMonth() + 1) + '/' + d.getDate(),
-          storageKey: `asmr_project_${d.toISOString().split('T')[0]}`
+          dateKey: d.toISOString().split('T')[0]
         });
       }
 
@@ -336,105 +384,95 @@
       generateDateMoons();
     }
 
-   function playSelectedDateProject() {
-
-  const drafts = JSON.parse(
-    localStorage.getItem('my_asmr_projects') || '[]'
-  );
-
-
-  if(drafts.length === 0){
-    alert("暂无保存作品");
-    return;
-  }
-
-
-  const clips = drafts[0].clips;
-
-
-  if(!clips || clips.length === 0){
-    alert("作品里面没有视频片段");
-    return;
-  }
-
-
-  console.log("当前作品：", clips);
-
-
-  alert(
-    `找到 ${clips.length} 个视频片段，可以播放`
-  );
-
-}
+    // 加载指定日期的作品工程
+    function loadProjectForDate(index) {
+      const display = document.getElementById('draft-display');
+      const dateData = availableDates[index];
       
-      // 读取本地工程存储
-      const projectData = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
-
+      // 从本地存储读取所有保存的作品
+      const drafts = JSON.parse(localStorage.getItem('my_asmr_projects') || '[]');
+      
       display.innerHTML = '';
+      currentClips = [];
 
-      // 匹配当前选中日期的工程
-      if (projectData.length > 0 && index === 9) {
-        // 展示最新的工程封面
-        const firstVideo = projectData[0].clips[0];
-        if (firstVideo) {
-          const imgUrl = `https://img.youtube.com/vi/${firstVideo.id}/hqdefault.jpg`;
-          display.innerHTML = `<img src="${imgUrl}" alt="project cover">`;
+      // 本地存储有数据且处于选中状态时展示
+      if (drafts.length > 0 && index === 9) {
+        const project = drafts[0];
+        if (project && project.clips && project.clips.length > 0) {
+          currentClips = project.clips;
+          showVideoPreview(0); // 默认预览第一个片段
           return;
         }
       }
 
+      // 无作品时的占位文案
       display.innerHTML = `<div class="empty-display-hint">
         ${dateData.monthLabel} 暂无保存的工程。<br>去“创作”页面剪辑并保存一个吧！
       </div>`;
     }
 
+    // 展示静态图片预览与片段选择按钮
+    function showVideoPreview(clipIndex) {
+      const display = document.getElementById('draft-display');
+      const clip = currentClips[clipIndex];
+      if (!clip) return;
+
+      const imgUrl = `https://img.youtube.com/vi/${clip.id}/hqdefault.jpg`;
+      
+      let selectorHtml = '';
+      if (currentClips.length > 1) {
+        selectorHtml = `<div class="clip-selector-bar">`;
+        currentClips.forEach((c, idx) => {
+          selectorHtml += `<button class="clip-thumb-btn ${idx === clipIndex ? 'active' : ''}" onclick="event.stopPropagation(); showVideoPreview(${idx})">片段 ${idx + 1}</button>`;
+        });
+        selectorHtml += `</div>`;
+      }
+
+      display.innerHTML = `
+        <img src="${imgUrl}" alt="project cover">
+        ${selectorHtml}
+      `;
+    }
+
+    // 修复问题1：真正的播放逻辑，把封面图替换为可播放的 YouTube iframe
     function playSelectedDateProject() {
+      const dateData = availableDates[currentDateIndex];
+      const display = document.getElementById('draft-display');
 
-  const drafts = JSON.parse(
-    localStorage.getItem('my_asmr_projects') || '[]'
-  );
+      if (!currentClips || currentClips.length === 0) {
+        alert(`${dateData.monthLabel} 暂无保存的剪辑工程。`);
+        return;
+      }
 
+      // 默认播放第 1 个片段
+      playClip(0);
+    }
 
-  // 没有作品
-  if (drafts.length === 0) {
+    // 在展示框内加载 YouTube 视频播放
+    function playClip(clipIndex) {
+      const display = document.getElementById('draft-display');
+      const clip = currentClips[clipIndex];
+      if (!clip) return;
 
-    alert("该日期暂无保存的剪辑工程。");
+      // 如果有时间范围剪辑参数，拼接 start/end
+      let iframeSrc = `https://www.youtube.com/embed/${clip.id}?autoplay=1`;
+      if (clip.start) iframeSrc += `&start=${Math.floor(clip.start)}`;
+      if (clip.end) iframeSrc += `&end=${Math.floor(clip.end)}`;
 
-    return;
+      let selectorHtml = '';
+      if (currentClips.length > 1) {
+        selectorHtml = `<div class="clip-selector-bar">`;
+        currentClips.forEach((c, idx) => {
+          selectorHtml += `<button class="clip-thumb-btn ${idx === clipIndex ? 'active' : ''}" onclick="playClip(${idx})">▶ 片段 ${idx + 1}</button>`;
+        });
+        selectorHtml += `</div>`;
+      }
 
-  }
-
-
-  // 获取最新作品
-  const project = drafts[0];
-
-
-  // 获取剪辑片段
-  const clips = project.clips;
-
-
-  if (!clips || clips.length === 0) {
-
-    alert("作品中没有视频片段。");
-
-    return;
-
-  }
-
-
-  // 暂时打印检查数据
-  console.log("准备播放作品：", project);
-
-
-  console.log("视频片段：", clips);
-
-
-  alert(
-    `🎬 找到 ${clips.length} 个 ASMR 片段，准备播放`
-  );
-
-
-}
+      display.innerHTML = `
+        <iframe src="${iframeSrc}" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+        ${selectorHtml}
+      `;
+    }
 
     window.onload = initMyPage;
   </script>
