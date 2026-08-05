@@ -26,7 +26,7 @@
       color: #ffffff;
       display: flex;
       justify-content: center;
-      align-items: center;                  /* 垂直居中整个 App 内容 */
+      align-items: center;                 /* 垂直居中整个 App 内容 */
       overflow: hidden;
       position: relative;
     }
@@ -39,7 +39,7 @@
       background: transparent;
       display: flex;
       flex-direction: column;
-      justify-content: center;              /* 让主体垂直居于屏幕中部 */
+      justify-content: center;             /* 让主体垂直居于屏幕中部 */
       padding: 20px 16px 100px;             /* 底部留出悬浮播放按钮与导航栏空间 */
       gap: 20px;
       position: relative;
@@ -226,7 +226,7 @@
     /* 🌟 悬浮在底部月球上的播放按钮包裹区 */
     .planet-player-wrapper {
       position: fixed;
-      bottom: 80px;                         /* 位于底部导航栏上方 */
+      bottom: 80px;                     /* 位于底部导航栏上方 */
       left: 50%;
       transform: translateX(-50%);
       z-index: 20;
@@ -374,7 +374,7 @@
   <div class="modal-overlay" id="playerModal">
     <div class="modal-content">
       <div class="close-modal" onclick="closePlayerModal()">✕</div>
-      <iframe id="youtube-player" class="player-iframe" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+      <iframe id="youtube-player" class="player-iframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
       <div style="font-size:12px; color:rgba(255,255,255,0.7); text-align:center;" id="playing-status">正在准备播放...</div>
     </div>
   </div>
@@ -527,7 +527,7 @@
       </div>`;
     }
 
-    // 播放指定日期的工程
+    // 🌟 针对手机端优化的播放函数
     function playSelectedDateProject() {
       const dateData = availableDates[currentDateIndex];
       let rawData = localStorage.getItem(dateData.storageKey);
@@ -559,10 +559,16 @@
         const start = parseInt(firstClip.start || firstClip.startTime || 0);
         const end = firstClip.end ? parseInt(firstClip.end) : null;
 
-        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&start=${start}`;
+        // 改为安全自适应加载参数（在手机上更稳定），允许点击弹窗内的播放按钮正常观看
+        let embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=0&start=${start}&playsinline=1`;
         if (end) embedUrl += `&end=${end}`;
 
-        iframe.src = embedUrl;
+        // 手机端兼容：先置空再延迟赋予 src，触发重新渲染
+        iframe.src = '';
+        setTimeout(() => {
+          iframe.src = embedUrl;
+        }, 100);
+
         status.innerText = `正在播放 第 1/${timeline.length} 个片段`;
         modal.style.display = 'flex';
 
